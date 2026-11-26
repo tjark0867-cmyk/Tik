@@ -124,9 +124,9 @@ def main(story):
     fc = (
         "[0:v]scale=1080:1920:flags=lanczos,vignette=angle=PI/5:mode=forward,"
         f"ass={out / 'captions.ass'},format=yuv420p[v];"
-        "[1:a]aresample=44100,volume=1.0[vo];[2:a]volume=0.13[mu];"
-        "[mu][vo]sidechaincompress=threshold=0.05:ratio=4:attack=20:release=300[duck];"
-        "[vo][duck]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[a]"
+        "[1:a]aresample=44100,asplit=2[vo][vk];[2:a]volume=0.13[mu];"
+        "[mu][vk]sidechaincompress=threshold=0.05:ratio=4:attack=20:release=300[duck];"
+        "[vo][duck]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-12.3:TP=-1.2:LRA=11,aresample=44100[a]"
     )
     cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(out / "video_noaudio.mp4"), "-i", str(out / "voice.wav"), "-i", str(out / "music.wav"),
            "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{dur:.3f}",

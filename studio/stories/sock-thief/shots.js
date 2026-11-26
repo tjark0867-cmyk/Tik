@@ -229,7 +229,7 @@ export const shots = {
     const sleeper = L.makeChar({ coat: '#7d9bc1', hat: 'none', expr: 'sleep', mustache: true, shoes: null, socks: [SOCK[2], SOCK[4]] });
     sleeper.rotation.set(-Math.PI / 2, 0, 0); sleeper.position.set(0, 1.32, 1.45); bed.add(sleeper);
     bed.add(L.box(1.95, 0.85, 1.25, '#d9443a', { pos: [0, 1.28, 0.42] }));
-    return (t) => { L.pose(sleeper, { t, bob: 2 }); L.camMove(t / dur, { from: [-0.2, 2.2, 5.2], to: [-0.4, 2.0, 4.5], look: [-0.6, 1.2, 1.4] }); };
+    return (t) => { L.pose(sleeper, { t, bob: 2 }); L.camMove(t / dur, { from: [0.4, 3.9, 4.4], to: [0.2, 3.6, 3.9], look: [-0.6, 1.2, 1.2] }); };
   },
   street_mismatch(L, dur) {
     town(L, { lampsAt: [3] });
@@ -283,7 +283,7 @@ export const shots = {
     return (t) => { L.pose(p, { t, armR: [-1.4, -0.2] }); L.pose(c, { t, armL: [-1.2, 0.2] }); L.camMove(t / dur, { from: [-1.8, 2.5, 6.4], to: [-1.2, 2.4, 5.6], look: [0, 1.9, 1.2] }); };
   },
   board_sold(L, dur) { boardScene(L, [['PAIRS SOLD', 64], ['1000', 140]], { shop: true }); return (t) => L.camMove(t / dur, { from: [0.6, 1.7, 3.8], to: [0.2, 1.6, 3.2], look: [0, 1.45, 0.2] }); },
-  board_sold_2(L, dur) { boardScene(L, [['PAIRS SOLD', 64], ['1000', 140]], { shop: true, night: true }); return (t) => L.camMove(t / dur, { from: [-0.4, 1.4, 3.0], to: [-0.2, 1.5, 2.6], look: [0, 1.45, 0.2], roll: -0.04 }); },
+  board_sold_2(L, dur) { boardScene(L, [['PAIRS SOLD', 64], ['1000', 140]], { shop: true, night: true }); return (t) => L.camMove(t / dur, { from: [-0.4, 1.5, 4.0], to: [-0.2, 1.5, 3.5], look: [0, 1.45, 0.2], roll: -0.04 }); },
   lonely_table(L, dur) {
     L.newScene({ bg: '#cfe3ef' }); L.lights({ sun: [-3, 6, 5], amb: 1.2, shadowSize: 4 });
     L.room({ w: 8, d: 6, h: 4, wall: '#9fb8a0', sideWalls: false });
@@ -316,8 +316,8 @@ export const shots = {
     const band = L.note('NEW PAIR!', { w: 0.42, size: 90, color: '#f6efd8', ink: '#c8312f' }); band.rotation.set(-Math.PI / 2.6, 0, 0); L.scene.add(band);
     return (t) => {
       const u = t / dur, k = L.ease(u / 0.6);
-      a.position.set(-1.0 + k * 0.82, 1.07, 1.0); b.position.set(1.0 - k * 0.82 + 0.12, 1.07, 1.12);
-      tagA.position.set(-0.95, 1.08, 1.55); tagB.position.set(0.95, 1.08, 1.55);
+      a.position.set(-0.6 + k * 0.42, 1.07, 1.0); b.position.set(0.6 - k * 0.42 + 0.12, 1.07, 1.12);
+      tagA.position.set(-0.55 + k * 0.2, 1.08, 1.6); tagB.position.set(0.55 - k * 0.2, 1.08, 1.6);
       const pop = L.easeOut((u - 0.62) / 0.2); band.scale.setScalar(Math.max(0.001, pop)); band.position.set(0.1, 1.35, 1.3);
       L.camMove(u, { from: [0, 3.3, 2.9], to: [0, 3.0, 2.5], look: [0, 1.05, 1.15] });
     };
