@@ -24,7 +24,8 @@ function serve() {
   const page = await browser.newPage({ viewport: { width: 720, height: 1280 } });
   page.on('console', (m) => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', (e) => console.error('[pageerror]', e.message));
-  await page.goto(`http://localhost:${port}/engine/index.html?story=${story}`);
+  const size = opt('--size', '720x1280').split('x');
+  await page.goto(`http://localhost:${port}/engine/index.html?story=${story}&w=${size[0]}&h=${size[1]}`);
   await page.waitForFunction('window.ready === true', null, { timeout: 60000 });
   const outDir = path.join(ROOT, 'stories', story, 'out'); fs.mkdirSync(outDir, { recursive: true });
 

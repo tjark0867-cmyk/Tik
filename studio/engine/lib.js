@@ -6,11 +6,12 @@ import { OutlineEffect } from './OutlineEffect.js';
 export { THREE };
 
 // ---------------------------------------------------------------- Renderer
-export const W = 720, H = 1280;
+export let W = 720, H = 1280;
 export let renderer, effect, scene, camera;
 const disposables = [];
 
-export function init(canvas) {
+export function init(canvas, w = 720, h = 1280) {
+  W = w; H = h;
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(1);
   renderer.setSize(W, H, false);

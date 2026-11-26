@@ -8,7 +8,8 @@ import * as L from './lib.js';
 const story = new URLSearchParams(location.search).get('story');
 const mod = await import(`/stories/${story}/shots.js`);
 await L.loadFonts();
-L.init(document.getElementById('c'));
+const qs = new URLSearchParams(location.search);
+L.init(document.getElementById('c'), +(qs.get('w') || 720), +(qs.get('h') || 1280));
 let update = null, dur = 1;
 window.studio = {
   shots: Object.keys(mod.shots),
