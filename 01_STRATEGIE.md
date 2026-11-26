@@ -1,84 +1,83 @@
-# 01 – Strategie: Das Geschäftsmodell
+# 01 – Strategie: Faceless-Kanal, bezahlt pro View
 
 ## Kurz gesagt
 
-**Account:** „Budget mit Plan“ – Geld sparen & Finanzen ordnen für normale Leute (20–40 J., DACH).
-**Geld kommt aus 3 Quellen:**
+**Kanal:** „Milliarden Storys“: Geschichten hinter bekannten Firmen und Marken, 60–90 Sekunden, ohne Gesicht.
+**Plattformen:** TikTok **und** YouTube Shorts, also jedes Video auf beiden.
+**Geld kommt nur von den Plattformen:** kein Shop, kein eigenes Produkt.
 
-| # | Einnahmequelle | Warum |
-|---|---|---|
-| 1 | **Eigenes Digitalprodukt:** Finanz-Planer 2027 (Excel/Google Sheets, 19 €) | ~70 % Marge, liegt fertig in `produkt/`, einmal bauen → unendlich verkaufen |
-| 2 | **TikTok Shop Affiliate:** Spar- & Haushalts-Gadgets | Provision pro Verkauf, kein Lager, kein Kundenservice |
-| 3 | **Creator Rewards** (TikTok zahlt pro View) | Bonus obendrauf, sobald 10k Follower |
+| Einnahmequelle | Voraussetzungen (Stand Ende 2026, kann sich ändern) |
+|---|---|
+| **TikTok Creator Rewards Program** | 18+, persönliches Konto, 10.000 Follower, 100.000 Views in den letzten 30 Tagen, **Videos über 1 Minute**, eigener Original-Content |
+| **YouTube-Partnerprogramm (Shorts-Werbeanteil)** | 1.000 Abonnenten + 10 Mio. Shorts-Views in 90 Tagen (oder 4.000 Wiedergabestunden bei Langvideos) |
 
-**Warum genau diese Nische, genau jetzt?**
-- **Timing:** Black Friday ist morgen (27.11.), danach kommt der **Januar – der stärkste Monat des Jahres für Finanz- und Budget-Content** („2027 wird mein Jahr“). Wer im Dezember den Account aufbaut, erntet im Januar.
-- **Faceless möglich:** Bildschirmaufnahmen vom Planer, Hände, Kassenbons, Text-Overlays. Gesicht zeigen hilft, ist aber kein Muss.
-- **Riesige Zielgruppe:** Jeder hat Geldsorgen, Inflation ist Dauerthema – Spar-Content wird geteilt und gespeichert (= Algorithmus-Signal).
-- **Content geht nie aus:** Preise, Abos, Supermarkt-Vergleiche, Challenges, Gehalts-Aufteilungen …
-- **Das Produkt ist im Video sichtbar:** Jedes „So teile ich mein Gehalt auf“-Video ist gleichzeitig eine Produktvorführung.
+## Warum genau diese Nische?
+
+1. **Länge passt:** TikTok zahlt nur für Videos über 1 Minute. Eine Firmengeschichte füllt 70–80 Sekunden, ohne dass sie gestreckt wirkt.
+2. **Leute schauen bis zum Ende:** Jede Story hat einen eingebauten Twist. Die Watchtime ist das wichtigste Signal für den Algorithmus.
+3. **Gute Werbeeinnahmen:** Wirtschaft und Geld sind für Werbekunden wertvoll. Das hebt die Einnahmen pro View, besonders auf YouTube.
+4. **Werbefreundlich:** Keine heiklen Themen wie True Crime oder Unfälle, die demonetarisiert werden.
+5. **Kein Ende in Sicht:** Es gibt Tausende Firmen, und jede hat eine Geschichte. 60 Ideen liegen bereit.
+6. **Original statt Reupload:** Eigene Recherche, eigenes Skript und eigener Schnitt erfüllen die Originalitätsregeln beider Plattformen. Wichtig, siehe unten.
 
 ---
 
 ## Die 500-€-Rechnung (ehrlich)
 
-Ausgerechnet im `business/Business-Tracker.xlsx` → Tab **Rechner** (Annahmen dort änderbar):
+Alles rechnet live in `business/Business-Tracker.xlsx` → Tab **Rechner**.
 
-| Quelle | Annahme | € / Tag |
-|---|---|---|
-| Finanz-Planer | ~24 Verkäufe × 13,47 € netto (19 € − USt − Digistore-Gebühr) | **~329 €** |
-| TikTok Shop Affiliate | ~37 Verkäufe × 25 € × 12 % Provision | **~110 €** |
-| Creator Rewards | ~122k qualifizierte Views × 0,50 €/1.000 | **~61 €** |
-| **Summe** | | **500 €** |
+**Annahmen:** TikTok zahlt 0,60 € pro 1.000 qualifizierte Views, und 60 % der Views zählen. YouTube Shorts zahlt 0,06 € pro 1.000 Views. Jedes Video läuft auf beiden Plattformen etwa gleich gut.
+→ **Ein TikTok-View mit seinem YouTube-Zwilling bringt ca. 0,42 € pro 1.000.**
 
-**Was du dafür brauchst: ≈ 300.000 Views pro Tag** – also 3 Videos/Tag mit Ø ~100.000 Views.
-Das ist ein mittelgroßer Account (ca. 50–150k Follower). Machbar, aber **nicht in 15 Minuten und nicht garantiert.**
+| Szenario | TikTok-Views/Tag | YT-Shorts-Views/Tag | Pro Video (3/Tag) | Ergebnis |
+|---|---|---|---|---|
+| **A – Nur Shorts** | ~1,19 Mio. | ~1,19 Mio. | ~400k je Plattform | 429 € TikTok + 71 € YouTube = **500 €** |
+| **B – Shorts + Sponsoring** (3.000 €/Monat) | ~950k | ~950k | ~320k je Plattform | **500 €** |
+| **C – Shorts + Sponsoring + Langvideos** (30k Views/Tag à 6 €/1.000) | ~520k | ~520k | ~175k je Plattform | **500 €** |
+
+### Was das heißt
+- **Nur mit Shorts-Views sind 500 €/Tag rund 2,4 Mio. Views pro Tag.** Das schaffen nur die oberen paar Prozent der Faceless-Kanäle. Es ist möglich, aber das ist die ehrliche Größenordnung.
+- **YouTube Shorts allein zahlt am wenigsten pro View.** Der Großteil kommt aus den TikTok Creator Rewards.
+- **Die zwei stärksten Hebel ohne eigenes Produkt:**
+  1. **Sponsoring.** Marken (Apps, Banken, Lernplattformen) bezahlen eine Erwähnung im Video. Du verkaufst dabei nichts selbst, es ist eine Werbefläche. Das wird ab etwa 50–100k Followern realistisch.
+  2. **YouTube-Langvideos.** Die gleichen Storys als 8–12-Minuten-Zusammenschnitt, etwa „10 Firmen, die fast pleite waren“. Sie bringen **50–100× mehr pro View** als Shorts und kosten kaum Mehrarbeit, weil die Skripte schon da sind.
 
 ### Realistischer Zeitplan
 
-| Phase | Zeitraum | Fokus | Typischer Umsatz |
+| Phase | Zeitraum | Ziel | Typische Einnahmen |
 |---|---|---|---|
-| **1 – Start** | Tag 1–14 | 2–3 Videos/Tag, 5 Formate testen, Planer-Verkaufsseite live | 0–20 €/Tag |
-| **2 – Finden** | Tag 15–45 | Die 2 besten Formate verdoppeln, Januar-Welle reiten, 1.000 Follower → Link in Bio + Shop-Affiliate | 20–150 €/Tag |
-| **3 – Skalieren** | Monat 2–4 | 3 Videos/Tag, 1 LIVE/Woche, E-Mail-Liste, Upsell | 150–350 €/Tag |
-| **4 – 500 €** | Monat 4–6 | Zweiter Account, Content auf Reels/Shorts recyceln, Cutter/UGC-Creator einstellen | 500 €+/Tag |
+| **1 – Aufbau** | Woche 1–6 | 2–3 Videos/Tag auf beiden Plattformen, 10k TikTok-Follower | 0 € (noch nicht monetarisiert) |
+| **2 – Monetarisiert** | Monat 2–4 | Creator Rewards aktiv, YouTube-Partnerprogramm beantragen | 5–80 €/Tag |
+| **3 – Skalieren** | Monat 4–8 | Gewinner-Formate klonen, Langvideos starten, erste Sponsoren | 80–250 €/Tag |
+| **4 – 500 €** | Monat 6–12 | 2. Kanal (z. B. englische Version, die auf YouTube mehr pro View bringt), Cutter einstellen | 500 €+/Tag |
 
-### Ehrlicher Realitätscheck
-- Die meisten Accounts erreichen das nie – nicht weil das Modell nicht funktioniert, sondern weil sie nach 3 Wochen aufhören. **Der Plan funktioniert nur mit 60–90 Videos im ersten Monat.**
-- Die Konversionsraten im Rechner sind **Annahmen**. Nach 2–3 Wochen trägst du deine echten Werte ein, dann siehst du die ehrliche Prognose.
-- **Abbruch-Kriterien** (statt endlos weitermachen):
-  - Nach 30 Tagen / 60 Videos kein Video über 10.000 Views → Hooks & Format ändern (siehe `04_HOOKS_UND_CAPTIONS.md`).
-  - Nach 60 Tagen immer noch nicht → Nische wechseln (Alternativen unten). Produkt-Logik bleibt gleich.
+Es gibt **keine Garantie**. Viele Kanäle kommen nie über Phase 1, meistens weil sie nach 3 Wochen aufhören.
+
+### Abbruch- und Wechselkriterien
+- **Nach 30 Tagen / 60 Videos** noch kein Video über 10k Views → zuerst die Hooks ändern (`05_HOOKS_UND_RETENTION.md`). Meistens liegt es daran.
+- **Nach 60 Tagen** immer noch nicht → Nische wechseln, gleicher Ablauf (Alternativen unten).
 
 ---
 
-## Die 3 Hebel, die am meisten Geld bringen
+## ⚠️ Originalität: entscheidet, ob du bezahlt wirst
 
-1. **Produkt-Demo-Videos** („Ich zeig dir, wie ich 2.400 € netto aufteile“) verkaufen 5–10× besser als reine Tipp-Videos. Mindestens **1 von 3 Videos** zeigt den Planer.
-2. **Hook in den ersten 1,5 Sekunden.** Ein Video mit gutem Hook und mittelmäßigem Inhalt schlägt immer ein Video mit großartigem Inhalt und schwachem Hook.
-3. **Serien** („Tag 12 von 52 Wochen sparen“) → Leute folgen, um Teil 2 zu sehen. Follower = wiederkehrende Käufer.
+Beide Plattformen bezahlen **keinen** massenhaft produzierten, wiederholten oder kopierten Inhalt. YouTube hat diese Regeln 2025 nochmal verschärft.
 
-## Preis- & Produktleiter (später)
+**Erlaubt und bezahlt:**
+- Eigenes Skript mit eigener Recherche und eigenem Blickwinkel
+- Eigener Schnitt, eigene Textanimationen, Stockmaterial mit Lizenz, eigene oder lizenzierte KI-Bilder
+- KI-Stimme ist okay. Die eigene Stimme ist noch besser, weil sie Wiedererkennung und Vertrauen schafft.
 
-| Stufe | Produkt | Preis | Ab wann |
-|---|---|---|---|
-| Gratis | „Spar-Checkliste: 25 Kosten, die du sofort kündigen kannst“ (E-Mail-Magnet) | 0 € | Phase 2 |
-| Kern | **Finanz-Planer 2027** | 19 € (Launch: 14 €) | **Sofort** |
-| Order-Bump | „Spar-Challenge-Paket“ (6 druckbare Challenges) | +9 € | Phase 2 |
-| Upsell | „30-Tage-Schuldenfrei-Kurs“ (Videos + Workbook) | 49 € | Phase 3 |
+**Nicht bezahlt oder sogar gesperrt:**
+- Clips aus Filmen, Serien, TV oder fremden Videos
+- „Reddit-Story + Minecraft-Parkour“ und ähnliche Schablonen-Videos
+- 1:1 KI-generierte Videos ohne eigene Bearbeitung in Masse
+- Das gleiche Video mehrfach mit minimalen Änderungen
 
-Order-Bump mit ~30 % Annahme hebt den Ø-Warenkorb von 19 € auf ~22 € → weniger Views für dasselbe Ziel.
+## Alternativ-Nischen (gleicher Ablauf)
 
----
-
-## Alternativen, falls dir die Nische nicht liegt
-
-Gleiche Mechanik (Digitalprodukt + Shop-Affiliate + Rewards), andere Themen:
-
-| Nische | Digitalprodukt | Shop-Produkte | Vorteil |
-|---|---|---|---|
-| **KI für Selbstständige** | Prompt-Paket + Notion-Vorlagen (29 €) | Tech-Gadgets | Höhere Preise |
-| **Clean-Tok / Haushalt** | Putzplan & Haushaltsplaner (12 €) | Putzmittel, Gadgets | Bester Shop-Umsatz |
-| **Home-Workout** | 12-Wochen-Trainingsplan (24 €) | Fitness-Zubehör | Starke Vorher/Nachher-Videos |
-
-Sag mir, welche Nische – dann baue ich dir Produkt, Content-Plan und Landingpage dafür genauso um.
+| Nische | Warum | Risiko |
+|---|---|---|
+| **Psychologie-Fakten** („Warum dein Gehirn …“) | Riesige Reichweite, leicht zu bebildern | Viel Konkurrenz, Fakten sauber prüfen |
+| **Geschichte & Mysterien** | Sehr hohe Watchtime | Weniger Werbeumsatz als Wirtschaft |
+| **Geld-Wissen erklärt** (Inflation, Zinsen …) | Höchste Einnahmen pro View | Keine Anlageberatung geben |

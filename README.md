@@ -1,44 +1,42 @@
-# Budget mit Plan – TikTok-Business (Ziel: 500 €/Tag)
+# Milliarden Storys: Faceless-Kanal für TikTok & YouTube Shorts (Ziel: 500 €/Tag)
 
-Ein komplett vorbereitetes TikTok-Business im Bereich **Geld sparen & Finanzen ordnen**.
-Du verdienst an **drei Quellen**: deinem eigenen digitalen Produkt (Finanz-Planer 2027), TikTok-Shop-Provisionen und den Creator Rewards.
+Ein komplett vorbereiteter **Faceless-Kanal**: Geschichten hinter bekannten Firmen, 60–80 Sekunden, ohne Gesicht.
+**Geld kommt nur von den Plattformen**: TikTok Creator Rewards + YouTube-Shorts-Werbeanteil. Kein Shop, kein eigenes Produkt.
 
-> **Ehrlich vorweg:** In 15 Minuten ist alles *startklar* – Geld verdient es damit noch nicht. 500 €/Tag heißt rechnerisch **≈ 300.000 Views pro Tag** (3 Videos à ~100k). Realistisch sind dafür **4–6 Monate** mit täglich ~90 Minuten Arbeit, und es gibt keine Garantie. Alle Zahlen und Annahmen stehen offen im Rechner.
+> **Ehrlich vorweg:** In 15 Minuten ist der Kanal *startklar*, Geld verdient er damit noch nicht. Nur mit Shorts-Views heißt 500 €/Tag rechnerisch **≈ 2,4 Mio. Views pro Tag** (TikTok + YouTube zusammen). Realistisch sind dafür **6–12 Monate**, und es gibt keine Garantie. Mit optionalem Sponsoring und YouTube-Langvideos sinkt der Bedarf deutlich (siehe `01_STRATEGIE.md`). Alle Annahmen stehen offen im Rechner.
 
 ## ▶️ Start: Mach das jetzt
 
-1. **`02_SETUP_15_MINUTEN.md`** öffnen und Schritt für Schritt abarbeiten (Account, Bio, Produkt, erstes Video).
-2. **Morgen ist Black Friday und am 30.11. Kfz-Wechselstichtag** → die Videos #2 und #3 aus dem Content-Plan sofort posten.
+1. **`02_SETUP_15_MINUTEN.md`**: TikTok- und YouTube-Kanal anlegen, Werkzeuge einrichten.
+2. **`04_SKRIPTE.md` → Skript #1** einsprechen, nach `03_PRODUKTION.md` schneiden, auf beiden Plattformen posten.
+3. Ab morgen: **3 Videos pro Tag**, Reihenfolge steht in `04_SKRIPTE.md`.
 
 ## 📁 Was drin ist
 
 | Datei | Wofür |
 |---|---|
-| `01_STRATEGIE.md` | Geschäftsmodell, warum diese Nische, die 500-€-Rechnung, Zeitplan, Abbruchkriterien, Alternativ-Nischen |
-| `02_SETUP_15_MINUTEN.md` | Account-Setup zum Abhaken + tägliche Routine + Freischaltungen |
-| `03_CONTENT_30_TAGE.md` | **30 fertige Video-Skripte** mit Hook, Ablauf, CTA + Posting-Kalender + „30 → 90 Videos“-Methode |
-| `04_HOOKS_UND_CAPTIONS.md` | 40 Hook-Vorlagen, Caption-Formel, Hashtags, Kommentar-Antworten, LIVE-Ablauf |
-| `05_RECHT_UND_STEUERN.md` | Gewerbe, Kleinunternehmer-Grenzen, Impressum, Werbekennzeichnung, Rücklagen |
-| `produkt/Finanz-Planer-2027.xlsx` | **Das Produkt, das du verkaufst** (7 Tabs, alles rechnet automatisch) |
-| `produkt/Finanz-Planer-2027-DEMO.xlsx` | Ausgefüllte Version für Bildschirmaufnahmen in deinen Videos |
-| `produkt/VERKAUFSTEXT.md` | Produkttexte zum Kopieren (Digistore24, Instagram, Danke-Mail) |
-| `landingpage/` | Fertige Verkaufsseite (mobil optimiert) + Impressum/Datenschutz-Vorlagen + Hosting-Anleitung |
-| `business/Business-Tracker.xlsx` | **500-€-Rechner** (Annahmen änderbar) + täglicher KPI-Report für 180 Tage + Übersicht mit Diagramm |
-| `scripts/build_xlsx.py` | Erzeugt alle Excel-Dateien neu (`python3 scripts/build_xlsx.py`) |
+| `01_STRATEGIE.md` | Nische, Einnahmequellen, 500-€-Rechnung mit 3 Szenarien, Zeitplan, Originalitätsregeln, Alternativ-Nischen |
+| `02_SETUP_15_MINUTEN.md` | Accounts, Bio, Tools, Impressum, tägliche Routine, Freischaltungen |
+| `03_PRODUKTION.md` | Ein Faceless-Video in 6 Schritten: Recherche, Skript-Aufbau, KI-Prompt, Voiceover, CapCut-Vorlage, Upload, Qualitäts-Check |
+| `04_SKRIPTE.md` | **15 fertige Sprechertexte** (179–204 Wörter, mit Bildideen, YouTube-Titel, Faktenhinweisen) + **45 weitere Ideen** mit Hook |
+| `05_HOOKS_UND_RETENTION.md` | 30 Hook-Vorlagen, 6 Spannungstechniken, Kennzahlen, Titel, Kommentar-Strategie, Hook-Tests |
+| `06_RECHT_UND_STEUERN.md` | Gewerbe, Kleinunternehmer-Grenze, Reverse Charge, Steuerformulare, Impressum, Urheberrecht, KI-Kennzeichnung |
+| `business/Business-Tracker.xlsx` | **Views-Rechner** · **Übersicht** (Fortschritt zur Monetarisierung, echte Einnahmen pro 1.000 Views, Diagramm) · **Tagesreport** (180 Tage) · **Content-Pipeline** (60 Ideen mit Status) |
+| `impressum/` | Impressum- und Datenschutz-Vorlage zum Ausfüllen und kostenlosen Hosten |
+| `scripts/build_xlsx.py` | Erzeugt den Tracker neu (`python3 scripts/build_xlsx.py`) |
 
 ## 💶 Die Rechnung auf einen Blick
 
-| Quelle | Annahme pro Tag | € / Tag |
+| | Annahme | Für 500 €/Tag nötig |
 |---|---|---|
-| Finanz-Planer (19 €, ~13,47 € netto) | ~24 Verkäufe | ~329 € |
-| TikTok Shop Affiliate (Ø 25 €, 12 %) | ~37 Verkäufe | ~110 € |
-| Creator Rewards (0,50 €/1.000 qual. Views) | ~122k qual. Views | ~61 € |
-| **Gesamt** | **≈ 305.000 Views/Tag** | **500 €** |
+| TikTok Creator Rewards | 0,60 € pro 1.000 qualif. Views, 60 % qualifiziert | ~1,19 Mio. TikTok-Views/Tag → **~429 €** |
+| YouTube Shorts | 0,06 € pro 1.000 Views | ~1,19 Mio. Shorts-Views/Tag → **~71 €** |
+| **Pro Video** (3 Videos/Tag) | | **~400.000 Views je Plattform** |
 
-Nach 2–3 Wochen deine **echten** Werte in `business/Business-Tracker.xlsx` eintragen – dann zeigt der Rechner deine ehrliche Prognose.
+Sobald die ersten Auszahlungen da sind, zeigt die Übersicht deine **echten** Werte. Die trägst du in den Rechner ein, dann ist die Prognose ehrlich.
 
-## Was ich noch von dir brauche, um weiterzumachen
+## Was mir noch helfen würde
 
-- Gefällt dir die Nische – oder lieber KI-Tools, Haushalt/Clean-Tok oder Home-Workout? (Ich baue alles um.)
-- Willst du dein Gesicht zeigen oder komplett faceless?
-- Wie viele Stunden pro Tag hast du realistisch?
+- Eigene Stimme oder KI-Stimme?
+- Sollen die Storys auch als YouTube-**Langvideos** laufen (der stärkste Hebel, siehe Strategie)?
+- Lieber eine andere Faceless-Nische (Psychologie, Geschichte/Mysterien, Geld-Wissen)? Dann baue ich Skripte und Ideen dafür um.

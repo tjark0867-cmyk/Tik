@@ -1,67 +1,79 @@
 # 02 – Setup: Die ersten 15 Minuten
 
-Stoppuhr an. Alles hier ist so vorbereitet, dass du nur noch klicken und kopieren musst.
+## ⏱ Minute 0–5: TikTok
 
-## ⏱ Minute 0–5: TikTok-Account
-
-1. Neuen TikTok-Account anlegen (eigene E-Mail, nicht dein Privat-Account).
-2. **Kontotyp: Persönliches Konto lassen – NICHT auf „Unternehmenskonto“ wechseln.**
-   - Grund: Nur persönliche Konten können ins **Creator Rewards Programm** und haben die volle Musikbibliothek.
-   - Nachteil: Link in Bio gibt es erst ab **1.000 Followern** (Stand Ende 2026 – TikTok ändert das gelegentlich).
-   - Lösung bis dahin: Instagram-Account im TikTok-Profil verknüpfen, dort steht der Link (siehe unten).
-3. **Name:** `Budget mit Plan`
-   **Username (in dieser Reihenfolge probieren):** `@budgetmitplan` · `@budget.mit.plan` · `@budgetmitplan.de` · `@deinbudgetplan`
-4. **Profilbild:** Grüner Hintergrund (#1F6F43), weißes „€“-Symbol oder dein Gesicht mit grünem Hintergrund. 2 Minuten in Canva.
-5. **Bio** (max. 80 Zeichen – kopieren):
+1. Neuen Account anlegen (eigene E-Mail, nicht dein Privat-Account).
+2. **Kontotyp: persönliches Konto lassen und NICHT auf „Unternehmenskonto“ wechseln.** Nur persönliche Konten kommen ins Creator Rewards Program.
+3. **Name:** `Milliarden Storys`
+   **Username** (der Reihe nach probieren): `@milliardenstorys` · `@milliarden.storys` · `@milliardenstory` · `@firmenstorys`
+4. **Profilbild:** Dunkelblauer Hintergrund (#1F3A5F) mit goldenem „M“ oder einem Geldsack-Symbol. 2 Minuten in Canva.
+5. **Bio** (kopieren):
    ```
-   Mehr Geld übrig – ohne Verzicht 💶
-   Täglich 1 Spar-Hack
-   👇 Finanz-Planer 2027
+   Die Storys hinter Firmen, die du jeden Tag siehst 💰
+   Täglich neue Story
    ```
+6. Einstellungen → Konto: **„Inhalte von KI kennzeichnen“** kennen. Sobald du realistische KI-Bilder nutzt, beim Posten den KI-Schalter aktivieren.
 
-## ⏱ Minute 5–8: Instagram als Link-Brücke
+## ⏱ Minute 5–9: YouTube
 
-1. Instagram-Account mit gleichem Namen anlegen.
-2. In Instagram-Bio den Link zur Verkaufsseite setzen (bzw. erstmal den Digistore24-Link, sobald er da ist).
-3. In TikTok: Profil bearbeiten → Instagram hinzufügen.
-4. Bonus: Jedes TikTok-Video auch als Reel hochladen (ohne TikTok-Wasserzeichen – Original-Datei speichern!).
+1. Mit einem Google-Konto auf YouTube → „Kanal erstellen“ → **Name:** `Milliarden Storys`, **Handle:** wie bei TikTok.
+2. **Kanalbeschreibung** (kopieren):
+   ```
+   Wie wurde McDonald's zum Immobilienkonzern? Warum gibt es zwei Aldis? Wer war der dritte Apple-Gründer?
+   Hier bekommst du die Geschichten hinter den Firmen, die du jeden Tag siehst – kurz, spannend, auf den Punkt.
+   Neue Storys jeden Tag.
+   ```
+3. Gleiches Profilbild, Banner mit 3 Firmennamen als Text (keine fremden Logos).
+4. Unter „Kanal anpassen → Links“ kommt später der Impressum-Link hin (siehe unten).
 
-## ⏱ Minute 8–12: Produkt verkaufsbereit machen
+## ⏱ Minute 9–12: Werkzeuge (alles mit Gratis-Version)
 
-1. Bei **Digistore24** als Vendor registrieren (kostenlos, deutsch, übernimmt Umsatzsteuer, Rechnungen und Zahlungsarten).
-   Alternativen: Gumroad oder Lemon Squeezy (übernehmen die Umsatzsteuer ebenfalls als „Merchant of Record“). Stan Store & Co. sind das nicht – dann musst du EU-Umsatzsteuer selbst abführen.
-2. Neues Produkt anlegen:
-   - Name: **Finanz-Planer 2027 – Excel & Google Sheets**
-   - Preis: **19 €** (oder Launch-Preis 14 € für die ersten 100 Käufer)
-   - Datei: `produkt/Finanz-Planer-2027.xlsx` hochladen (NICHT die DEMO-Datei)
-   - Produkttext: aus `produkt/VERKAUFSTEXT.md` kopieren
-   - Verkaufsseite: `landingpage/index.html` (Hosting siehe `landingpage/README.md`)
-3. Digistore prüft neue Produkte – das kann ein paar Tage dauern. **Nicht warten – parallel Content posten.**
+| Wofür | Tool | Kosten |
+|---|---|---|
+| Recherche & Skript-Entwurf | ChatGPT / Claude + Wikipedia + Firmenwebsite zum Gegenprüfen | 0 € |
+| Stimme | **eigene Stimme** (Handy reicht, ruhiger Raum) **oder** ElevenLabs (KI-Stimme) | 0–22 €/Monat |
+| Bildmaterial | Pexels, Pixabay (Stockvideos, gratis), Canva, KI-Bilder | 0 € |
+| Schnitt & Untertitel | **CapCut** (Desktop) | 0 € (Pro optional) |
+| Planung & Zahlen | `business/Business-Tracker.xlsx` | 0 € |
 
-## ⏱ Minute 12–15: Erstes Video
+## ⏱ Minute 12–15: Erstes Video vorbereiten
 
-1. `produkt/Finanz-Planer-2027-DEMO.xlsx` auf dem Laptop öffnen.
-2. Video **#1 aus `03_CONTENT_30_TAGE.md`** aufnehmen (Bildschirmaufnahme + Stimme, 20–30 Sek.).
-3. Posten. Fertig. Das Business läuft.
+1. `04_SKRIPTE.md` öffnen → **Skript #1 (McDonald's)**.
+2. Sprechertext einmal laut vorlesen und aufnehmen (oder in ElevenLabs einfügen).
+3. Nach `03_PRODUKTION.md` schneiden → auf TikTok **und** YouTube Shorts posten.
 
 ---
 
-## Die ersten 7 Tage – tägliche Routine (≈ 90 Min/Tag)
+## Impressum (Pflicht in Deutschland, sobald du Geld verdienst)
 
-| Uhrzeit | Was | Dauer |
+Wer in Deutschland geschäftsmäßig Social Media betreibt, und das tust du mit Monetarisierung, braucht ein Impressum, das vom Profil aus erreichbar ist.
+1. `impressum/index.html` ausfüllen (gelbe Platzhalter).
+2. Den Ordner `impressum/` auf **Netlify Drop** (app.netlify.com/drop) ziehen → du bekommst eine Gratis-URL.
+3. Link eintragen: YouTube → Kanal-Links. TikTok → Website in der Bio (ab 1.000 Followern verfügbar), bis dahin Text in der Bio: „Impressum: [deine-url]“.
+
+---
+
+## Tägliche Routine (≈ 2–2,5 Std. für 3 Videos)
+
+| Block | Was | Dauer |
 |---|---|---|
-| Morgens | 15 Min. auf der For-You-Page in der Nische scrollen, liken, kommentieren (trainiert den Algorithmus auf deinen Account) | 15 Min |
-| Batch | 3 Videos aus dem Content-Plan aufnehmen & schneiden (CapCut) | 45 Min |
-| 12–13 Uhr | Video 1 posten | – |
-| 17–18 Uhr | Video 2 posten | – |
-| 20–21 Uhr | Video 3 posten | – |
-| Nach Post | 30 Min. lang auf Kommentare antworten (Video-Antworten auf Fragen = neue Video-Ideen!) | 20 Min |
-| Abends | Zahlen in `business/Business-Tracker.xlsx` → Tagesreport | 2 Min |
+| Morgens | 15 Min. in der Nische scrollen und kommentieren (trainiert den Algorithmus) | 15 Min |
+| Batch 1 | 3 Skripte recherchieren und schreiben (bzw. aus `04_SKRIPTE.md` nehmen) | 45 Min |
+| Batch 2 | 3 Voiceovers aufnehmen | 15 Min |
+| Batch 3 | 3 Videos schneiden (mit Vorlage ca. 20 Min. pro Video) | 60 Min |
+| Posten | 12 Uhr · 17 Uhr · 20 Uhr, auf TikTok und YouTube gleichzeitig | 10 Min |
+| Danach | Kommentare beantworten, Fragen = neue Video-Ideen | 15 Min |
+| Abends | Zahlen in den Tagesreport eintragen | 2 Min |
 
-## Freischaltungen – sobald erreicht, sofort aktivieren
+**Tipp:** Am Wochenende 10–15 Videos vorproduzieren, dann sind es unter der Woche nur noch Posten und Antworten.
 
-| Meilenstein | Was du freischaltest | Was du tust |
-|---|---|---|
-| 1.000 Follower | Link in Bio, LIVE | Link zur Verkaufsseite in TikTok-Bio |
-| TikTok-Shop-Affiliate-Voraussetzungen erfüllt (Follower-Grenze in der App prüfen) | Produkte in Videos verlinken | Creator Center → TikTok Shop → Affiliate beitreten, 5–10 Spar-Gadgets in den Showcase |
-| 10.000 Follower + 100.000 Views in 30 Tagen | Creator Rewards | Ab dann Videos **über 1 Minute** machen (nur die zählen) |
+## Freischaltungen
+
+| Meilenstein | Was du tust |
+|---|---|
+| 1.000 TikTok-Follower | Impressum-Link als Website in die Bio |
+| TikTok: 10k Follower + 100k Views/30 Tage | Creator Center → **Creator Rewards Program** beantragen |
+| YouTube: 1.000 Abos + 10 Mio. Shorts-Views/90 Tage | YouTube Studio → **Verdienen** → Partnerprogramm beantragen, Shorts-Monetarisierung akzeptieren |
+| 50k+ Follower | Mediakit erstellen, Sponsoren anschreiben (optional) |
+
+Der **Tab „Übersicht“ im Tracker** zeigt dir für beide Programme automatisch, wie weit du bist.
