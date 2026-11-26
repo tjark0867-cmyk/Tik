@@ -3,6 +3,7 @@ import { meadow } from './meadow.js';
 const PAL = ['#c96f5a', '#e0b25c', '#6fa3a0', '#d98b6a', '#8fb07a', '#b5838d', '#7d9bc1'];
 export const shots = {
   meadow(L) { return meadow(L); },
+  meadow_notext(L) { const u = meadow(L); L.camera.children.forEach((c) => (c.visible = false)); return u; },
   banner(L) {
     L.newScene(); L.sky({ top: '#79b4dc', bottom: '#f6dcb8' }); L.lights({ sun: [5, 10, 9], amb: 1.15, shadowSize: 22 });
     L.scene.add(L.street({ len: 90, width: 90 }));
