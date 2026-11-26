@@ -1,0 +1,174 @@
+{
+  "title": "The Sock Thief",
+  "voice": "am_michael",
+  "speed": 1.04,
+  "beats": [
+    {
+      "text": "A thief broke into a different house every night,",
+      "shots": [
+        "town_night",
+        "sneak"
+      ]
+    },
+    {
+      "text": "and every night, he stole exactly one thing.",
+      "shots": [
+        "drawer_open"
+      ]
+    },
+    {
+      "text": "One sock.",
+      "shots": [
+        "take_sock"
+      ]
+    },
+    {
+      "text": "Not the pair. Just one.",
+      "shots": [
+        "lonely_night"
+      ]
+    },
+    {
+      "text": "No money missing. No jewelry touched.",
+      "shots": [
+        "valuables"
+      ]
+    },
+    {
+      "text": "Just a single, lonely sock, left behind in the drawer.",
+      "shots": [
+        "morning_woman",
+        "lonely_day"
+      ]
+    },
+    {
+      "text": "The newspapers called him the Sock Goblin.",
+      "shots": [
+        "newspaper"
+      ]
+    },
+    {
+      "text": "The police just laughed.",
+      "shots": [
+        "police_wide"
+      ]
+    },
+    {
+      "text": "A thief who steals one sock? That's not a crime. That's a laundry problem.",
+      "shots": [
+        "police_close",
+        "police_wide_laugh"
+      ]
+    },
+    {
+      "text": "Months went by.",
+      "shots": [
+        "calendar"
+      ]
+    },
+    {
+      "text": "Ten houses.",
+      "shots": [
+        "board_10"
+      ]
+    },
+    {
+      "text": "Fifty.",
+      "shots": [
+        "board_50"
+      ]
+    },
+    {
+      "text": "Two hundred.",
+      "shots": [
+        "board_200"
+      ]
+    },
+    {
+      "text": "People started sleeping with their socks on.",
+      "shots": [
+        "sleep_socks"
+      ]
+    },
+    {
+      "text": "Soon, nobody in town owned a matching pair.",
+      "shots": [
+        "street_mismatch",
+        "legs"
+      ]
+    },
+    {
+      "text": "Kids went to school in one red sock and one green one.",
+      "shots": [
+        "kids_school"
+      ]
+    },
+    {
+      "text": "Then, a little shop opened on Market Street.",
+      "shots": [
+        "shop_open"
+      ]
+    },
+    {
+      "text": "Fresh socks. Every pair guaranteed to match.",
+      "shots": [
+        "shop_sign"
+      ]
+    },
+    {
+      "text": "The line went around the block.",
+      "shots": [
+        "queue"
+      ]
+    },
+    {
+      "text": "In one week, old Mr. Pickett sold a thousand pairs.",
+      "shots": [
+        "pickett_counter",
+        "board_sold"
+      ]
+    },
+    {
+      "text": "You see, a single sock is useless.",
+      "shots": [
+        "lonely_table"
+      ]
+    },
+    {
+      "text": "So the whole town had to buy new pairs.",
+      "shots": [
+        "queue_bags"
+      ]
+    },
+    {
+      "text": "But Mr. Pickett never knitted a single sock.",
+      "shots": [
+        "pickett_close"
+      ]
+    },
+    {
+      "text": "Every pair he sold was two stolen socks,",
+      "shots": [
+        "backroom_wall"
+      ]
+    },
+    {
+      "text": "from two different houses.",
+      "shots": [
+        "pairing"
+      ]
+    },
+    {
+      "text": "A thousand pairs sold.",
+      "shots": [
+        "board_sold_2"
+      ]
+    },
+    {
+      "text": "And not one of them was new.",
+      "shots": [
+        "final"
+      ]
+    }
+  ]
+}

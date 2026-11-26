@@ -1,0 +1,19 @@
+{
+  "name": "studio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource/caveat": "^5.1.0",
+    "@fontsource/fredoka": "^5.1.0",
+    "@fontsource/permanent-marker": "^5.1.0",
+    "@fontsource/playfair-display": "^5.1.0",
+    "three": "^0.170.0"
+  }
+}

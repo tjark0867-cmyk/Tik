@@ -1,0 +1,112 @@
+"""Erzaehlstimme + Zeitplan.
+
+python3 pipeline/tts.py <story>
+
+Erzeugt in stories/<story>/out/:
+  voice.wav      – komplette Erzaehlung (Kokoro, lokal)
+  timeline.json  – Einstellungen mit Bildanzahl + Wort-Zeitpunkte fuer die Untertitel
+"""
+import json
+import re
+import sys
+from pathlib import Path
+
+import numpy as np
+import soundfile as sf
+from kokoro_onnx import Kokoro
+
+ROOT = Path(__file__).resolve().parent.parent
+FPS = 30
+LEAD_IN = 0.12
+TAIL = 0.7
+
+
+def trim(a, thr=0.012, pad=0.03, sr=24000):
+    idx = np.where(np.abs(a) > thr)[0]
+    if len(idx) == 0:
+        return a
+    s, e = max(0, idx[0] - int(pad * sr)), min(len(a), idx[-1] + int(pad * sr))
+    return a[s:e]
+
+
+def pause_after(text, last):
+    if last:
+        return TAIL
+    t = text.strip()
+    if t.endswith(","):
+        return 0.08
+    if t.endswith("?"):
+        return 0.26
+    return 0.2
+
+
+def words_of(text):
+    return [w for w in text.split() if re.search(r"\w", w)]
+
+
+def align(model, audio, sr, text, offset):
+    """Wort-Zeitpunkte: Whisper, wenn die Woerter passen – sonst proportional nach Zeichen."""
+    mine = words_of(text)
+    a16 = np.interp(np.arange(0, len(audio), sr / 16000), np.arange(len(audio)), audio).astype(np.float32)
+    segs, _ = model.transcribe(a16, word_timestamps=True, language="en", initial_prompt=text)
+    got = [w for s in segs for w in s.words]
+    dur = len(audio) / sr
+    if len(got) == len(mine):
+        out = [(w, offset + g.start, offset + g.end) for w, g in zip(mine, got)]
+    else:
+        lens = np.array([len(w) + 2 for w in mine], float)
+        edges = np.concatenate([[0], np.cumsum(lens)]) / lens.sum() * dur
+        out = [(w, offset + edges[i], offset + edges[i + 1]) for i, w in enumerate(mine)]
+    return out, len(got) == len(mine)
+
+
+def main(story):
+    sdir = ROOT / "stories" / story
+    cfg = json.loads((sdir / "story.json").read_text())
+    out = sdir / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    kok = Kokoro(str(ROOT / "models/kokoro-v1.0.onnx"), str(ROOT / "models/voices-v1.0.bin"))
+    from faster_whisper import WhisperModel
+    wm = WhisperModel("base.en", device="cpu", compute_type="int8", download_root=str(ROOT / "models/whisper"))
+
+    sr = 24000
+    pieces = [np.zeros(int(LEAD_IN * sr), np.float32)]
+    t = LEAD_IN
+    beats, words, exact = [], [], 0
+    for i, b in enumerate(cfg["beats"]):
+        last = i == len(cfg["beats"]) - 1
+        a, sr = kok.create(b["text"], voice=cfg.get("voice", "am_michael"), speed=cfg.get("speed", 1.0), lang="en-us")
+        a = trim(np.asarray(a, np.float32), sr=sr)
+        w, ok = align(wm, a, sr, b["text"], t)
+        exact += ok
+        words += [{"w": x, "start": round(s, 3), "end": round(e, 3)} for x, s, e in w]
+        gap = pause_after(b["text"], last)
+        beats.append({"start": t, "speech_end": t + len(a) / sr, "end": t + len(a) / sr + gap})
+        pieces += [a, np.zeros(int(gap * sr), np.float32)]
+        t += len(a) / sr + gap
+    voice = np.concatenate(pieces)
+    sf.write(out / "voice.wav", voice, sr)
+
+    # Einstellungen: Beat-Dauer auf die Shots verteilen; Bildgrenzen aus absoluten Zeiten (kein Drift)
+    shots = []
+    for b, bt in zip(cfg["beats"], beats):
+        ws = b.get("weights") or [1] * len(b["shots"])
+        acc = bt["start"] if bt is not beats[0] else 0.0
+        span = bt["end"] - acc
+        for sid, wgt in zip(b["shots"], ws):
+            dur = span * wgt / sum(ws)
+            shots.append({"id": sid, "t0": acc, "t1": acc + dur})
+            acc += dur
+    total = 0
+    for s in shots:
+        f1 = round(s["t1"] * FPS)
+        s["frames"] = f1 - total
+        total = f1
+    timeline = {"fps": FPS, "duration": len(voice) / sr, "frames": total,
+                "shots": [{"id": s["id"], "frames": s["frames"], "start": round(s["t0"], 3)} for s in shots], "words": words}
+    (out / "timeline.json").write_text(json.dumps(timeline, indent=1))
+    print(f"Stimme: {len(voice) / sr:.1f}s, {len(words)} Wörter, {exact}/{len(beats)} Beats exakt per Whisper, {len(shots)} Einstellungen")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1])
