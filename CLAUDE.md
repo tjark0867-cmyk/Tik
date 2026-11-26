@@ -1,0 +1,24 @@
+# Projekt-Regeln (Feedback des Nutzers – immer beachten)
+
+Dieses Repo produziert animierte Faceless-Story-Videos mit dem Studio in `studio/` (siehe `studio/README.md`).
+
+## Qualitätsregeln für jedes neue Video
+
+### 1. Keine Animationsfehler – zu 100 % vermeiden
+Feedback zu Video #1: Der Dieb ist in der Einstellung `sneak` mitten durch eine Laterne gelaufen (Laufweg x −2,2 → −0,9 bei z −0,4, Laterne bei x −1,2 / z −0,3).
+- Vor dem Rendern **jeden Laufweg gegen alle Requisiten prüfen** (Laternen, Briefkästen, Bäume, Tafeln, Möbel, Gebäude, andere Figuren). Mindestabstand ≈ 0,6 Einheiten zwischen Figur und Objekt.
+- Keine Figur darf durch Wände, Möbel, Tische oder andere Figuren gehen oder darin stehen; Gegenstände in Händen dürfen nicht durch den Körper ragen.
+- Vor dem Gesamt-Render von **jeder bewegten Einstellung Vorschaubilder am Anfang, in der Mitte und am Ende** anschauen (`--preview id:0:dur,id:mitte:dur,id:ende:dur`) und gezielt auf Durchdringungen prüfen.
+- Bei Unsicherheit: Laufweg so legen, dass er vor oder hinter dem Objekt vorbeiführt, oder das Objekt verschieben.
+
+### 2. Stimme wie im Vorlage-Video
+Feedback: Die Stimme soll wie im Vorlage-Video klingen – **einladender, wärmer, erzählerischer**. `am_michael` (Video #1) war zu nüchtern.
+- Vorlage: männlicher Erzähler, ca. 183 Wörter/Min., mittlere Stimmlage (Grundton ≈ 155 Hz), warmer, leicht verschmitzter Erzählton mit Spannung in den Pausen.
+- Vor dem nächsten Video: **3–4 Stimmproben** desselben Absatzes erzeugen (z. B. Kokoro `bm_george`, `bm_fable`, `am_puck`, `am_fenrir` sowie Mischungen) und den Nutzer **wählen lassen**, bevor gerendert wird. Ich kann Audio nicht selbst anhören.
+- Wenn keine Kokoro-Stimme nah genug herankommt: ElevenLabs vorschlagen (Nutzer gibt API-Key über das sichere Formular).
+
+## Allgemein
+- Keine OpenArt-Credits verwenden – alles selbst mit dem Studio erzeugen (Wunsch des Nutzers).
+- Sprache der Videos: Englisch. Kommunikation mit dem Nutzer: Deutsch.
+- Videos > 60 Sekunden (TikTok Creator Rewards).
+- Eigene Storys und Figuren; nichts aus fremden Videos übernehmen.
