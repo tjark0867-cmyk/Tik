@@ -1,6 +1,8 @@
+import { meadow } from './meadow.js';
 // YouTube-Kanalbanner "Tiny Town Tales" – 2560x1440 rendern. Sicherer Bereich (alle Geraete): mittig 1546x423 px.
 const PAL = ['#c96f5a', '#e0b25c', '#6fa3a0', '#d98b6a', '#8fb07a', '#b5838d', '#7d9bc1'];
 export const shots = {
+  meadow(L) { return meadow(L); },
   banner(L) {
     L.newScene(); L.sky({ top: '#79b4dc', bottom: '#f6dcb8' }); L.lights({ sun: [5, 10, 9], amb: 1.15, shadowSize: 22 });
     L.scene.add(L.street({ len: 90, width: 90 }));
@@ -39,7 +41,7 @@ export const shots = {
       c.fillStyle = '#3b2a20'; c.beginPath(); c.roundRect(1024 - w / 2, 395, w, 120, 60); c.fill();
       c.fillStyle = '#fff8e6'; c.fillText(sub, 1024, 457);
     });
-    const plane = new L.THREE.Mesh(new L.THREE.PlaneGeometry(1.86, 1.86 * 560 / 2048), L.noOutline(new L.THREE.MeshBasicMaterial({ map: tex, transparent: true, depthTest: false })));
+    const plane = new L.THREE.Mesh(new L.THREE.PlaneGeometry(1.86, 1.86 * 560 / 2048), L.noOutline(new L.THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1 })));
     plane.renderOrder = 10; plane.position.set(0, 0.03, -3); L.camera.add(plane); L.scene.add(L.camera);
     return (t) => {
       chars.forEach((c) => L.pose(c, { t: 0.4, armR: c.userData.act === 'wave' ? [-2.6, 0.6] : c.userData.act === 'sock' ? [-1.6, -0.1] : null, laugh: 0 }));
