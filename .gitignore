@@ -7,3 +7,4 @@ studio/node_modules/
 studio/models/
 studio/stories/*/out/
 studio/stories/test/
+studio/stories/*/*.mp4
