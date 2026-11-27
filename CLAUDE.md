@@ -30,6 +30,8 @@ Feedback: Die Stimme soll wie im Vorlage-Video klingen – **einladender, wärme
 - Story: Welt mit einer besonderen Regel → Familie in Not → Opfer steigert sich → Warnung → tragischer Twist. Ca. 290 Wörter / 75–80 s.
 
 ## Allgemein
+- **Keine Wasserzeichen** – weder sichtbar noch unhörbar (Nutzer-Wunsch). Deshalb **kein Chatterbox** (setzt ein unhörbares Perth-Wasserzeichen); Stimmen nur über Kokoro oder andere Modelle ohne Wasserzeichen.
+- **Keine fremden Stimmen klonen** (z. B. Erzähler aus Vorlage-Videos) – nur Stimmen, an denen der Nutzer die Rechte hat.
 - Keine OpenArt-Credits verwenden – alles selbst mit dem Studio erzeugen (Wunsch des Nutzers).
 - Sprache der Videos: Englisch. Kommunikation mit dem Nutzer: Deutsch.
 - Videos > 60 Sekunden (TikTok Creator Rewards).
