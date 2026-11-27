@@ -6,22 +6,8 @@ export function meadow(L) {
   L.lights({ sun: [-6, 12, 10], amb: 1.3, shadowSize: 14 });
   // Boden + Huegel
   L.scene.add(L.mesh(new T.PlaneGeometry(400, 400), L.toon('#7cc85a'), { rot: [-Math.PI / 2, 0, 0], shadow: false }));
-  L.scene.add(L.mesh(new T.SphereGeometry(9, 40, 20), L.toon('#8fd46a'), { pos: [0, 0.6 - 9 * 0.55, -27.5], scale: [1, 0.55, 1], shadow: false }));
   const hills = [[-30, -45, 26, '#6bbf4e'], [12, -55, 34, '#8fd46a'], [40, -42, 24, '#5fae45'], [-6, -38, 18, '#79c95a'], [22, -30, 14, '#6bbf4e']];
   for (const [x, z, r, c] of hills) L.scene.add(L.mesh(new T.SphereGeometry(r, 40, 20), L.toon(c), { pos: [x, -r * 0.42, z], scale: [1, 0.55, 1], shadow: false }));
-  // Kleine Stadt in der Ferne
-  const houseCols = ['#e86a5a', '#f2c14e', '#7fb3d5', '#f0a06a', '#b5838d', '#8fd46a'];
-  for (let i = 0; i < 7; i++) {
-    const g = new T.Group(); const x = -3.9 + i * 1.3, z = -25.6 - (i % 2) * 0.8;
-    g.add(L.box(1.2, 1.1, 1.0, houseCols[i % 6], { pos: [0, 0.55, 0] }));
-    const roof = L.mesh(new T.CylinderGeometry(0.75, 0.75, 1.1, 3), L.toon(['#a8443a', '#5b4a7a', '#3f6f9a'][i % 3]), { rot: [Math.PI / 2, 0, Math.PI / 2], pos: [0, 1.45, 0] });
-    roof.rotation.set(0, 0, 0); roof.rotation.x = Math.PI / 2; roof.rotation.z = Math.PI / 2; g.add(roof);
-    g.add(L.box(0.25, 0.3, 0.02, '#ffe9a6', { pos: [-0.25, 0.65, 0.51] })); g.add(L.box(0.25, 0.3, 0.02, '#ffe9a6', { pos: [0.25, 0.65, 0.51] }));
-    const hy = 0.6 - 9 * 0.55 + 0.55 * Math.sqrt(Math.max(0, 81 - x * x - (z + 27.5) ** 2)); g.position.set(x, hy - 0.08, z); g.scale.setScalar(0.65); L.scene.add(g);
-  }
-  const tower = new T.Group(); tower.position.set(0.9, 3.0, -29); tower.add(L.box(1.1, 3.6, 1.1, '#e9d8b4', { pos: [0, 1.8, 0] }));
-  tower.add(L.mesh(new T.ConeGeometry(0.95, 1.4, 4), L.toon('#a8443a'), { pos: [0, 4.3, 0], rot: [0, Math.PI / 4, 0] }));
-  tower.add(L.cyl(0.3, 0.3, 0.05, '#ffffff', { pos: [0, 2.9, 0.56], rot: [Math.PI / 2, 0, 0] }, 20)); tower.scale.setScalar(1.25);
   // Sonne + Wolken
   const sun = new T.Group(); sun.position.set(-17, 15, -40); L.scene.add(sun);
   sun.add(L.mesh(new T.SphereGeometry(2.6, 32, 24), L.noOutline(new T.MeshBasicMaterial({ color: '#ffd84a' })), { shadow: false }));
