@@ -172,7 +172,7 @@ def main(story):
     )
     cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(out / "video_noaudio.mp4"), "-i", str(out / "voice.wav"), "-i", str(out / "music.wav"),
            "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{dur:.3f}",
-           "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-profile:v", "high", "-r", "30",
+           "-c:v", "libx264", "-preset", "slow", "-crf", str(json.loads((sdir / "story.json").read_text()).get("crf", 18)), "-maxrate", "6M", "-bufsize", "12M", "-profile:v", "high", "-r", "30",
            "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(final)]
     subprocess.run(cmd, check=True)
     print(f"{n} Untertitel, Musik {dur:.1f}s → {final.relative_to(ROOT)}")
