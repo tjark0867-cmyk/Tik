@@ -21,7 +21,10 @@ Feedback: Die Stimme soll wie im Vorlage-Video klingen – **einladender, wärme
 
 ## Vorlage 2 – filmischer Stil ("Every Memory Has a Price")
 - Starke Lichtstimmung (warme Lampen in blauer Nacht), Leuchten (Bloom), Tiefenunschärfe, Nebel, Vignette, Filmkorn.
-- Figuren mit großen runden Augen (Cartoon-Stil), ausdrucksstarke Mimik (Tränen, Sorgen, Staunen).
+- **Zeichenstil wie Vorlage 2 (Nutzer-Feedback zu Video #3):** Figuren immer mit `style: 'ch'` (`makeChar2`): flacher heller Kopf mit dicker schwarzer Kontur, schmaler Pillen-Oberkörper (optional Weste), lange dünne Strich-Arme/-Beine, Frisuren (`hairStyle: 'spiky' | 'bun' | 'tufts'`).
+- Große runde Augen, kräftige Linien, ausdrucksstarke Mimik (Tränen, Sorgen, Staunen, Blinzeln).
+- Immer in **1080×1920 nativ** rendern (`"size": "1080x1920"` in story.json), nicht hochskalieren.
+- Kulissen-Details nutzen: Feuerleitern (`fireEscape`), Wimpelketten (`bunting`), Lichtkegel, Regen, Nebel.
 - Story: Welt mit einer besonderen Regel → Familie in Not → Opfer steigert sich → Warnung → tragischer Twist. Ca. 290 Wörter / 75–80 s.
 
 ## Allgemein

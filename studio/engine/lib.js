@@ -237,6 +237,7 @@ function drawFace(g, w, h, expr, o) {
  * hat: 'fedora' | 'police' | 'flatcap' | 'bowler' | 'beret' | 'none'
  */
 export function makeChar(o = {}) {
+  if (o.style === 'ch') return makeChar2(o);
   const C = Object.assign({ coat: '#c9a56a', hat: 'fedora', hatColor: '#6f7f9a', expr: 'smug', mustache: false, socks: null,
     dress: false, hair: null, glove: '#ffffff', legs: '#1b1b1b', shoes: '#4a2d1c', buttons: '#5a3b22', head: '#f2f1ec', scale: 1 }, o);
   const root = new THREE.Group();
@@ -350,9 +351,9 @@ export function pose(ch, { t = 0, walk = 0, sneak = 0, bob = 1, armL = null, arm
   P.legL.rotation.x = sw; P.legR.rotation.x = -sw;
   P.armL.rotation.x = walk ? -sw * 0.8 : Math.sin(t * 1.3) * 0.03;
   P.armR.rotation.x = walk ? sw * 0.8 : -Math.sin(t * 1.3) * 0.03;
-  P.armL.rotation.z = -0.28; P.armR.rotation.z = 0.28;
+  P.armL.rotation.z = -(P.armZ ?? 0.28); P.armR.rotation.z = P.armZ ?? 0.28;
   const breathe = Math.sin(t * 2.2) * 0.012 * bob;
-  P.body.position.y = 0.5 + breathe + (walk ? Math.abs(Math.cos(ph)) * 0.05 : 0) - sneak * 0.12;
+  P.body.position.y = (P.bodyY ?? 0.5) + breathe + (walk ? Math.abs(Math.cos(ph)) * 0.05 : 0) - sneak * 0.12;
   P.body.rotation.x = sneak * 0.25 + lean;
   P.body.rotation.z = laugh ? Math.sin(t * 22) * 0.05 * laugh : 0;
   P.head.rotation.set(nod ? Math.sin(t * 6) * 0.12 * nod : 0, look, laugh ? Math.sin(t * 18) * 0.06 * laugh : 0);
@@ -775,7 +776,8 @@ export function fog(color = '#1b2140', density = 0.035) { scene.fog = new THREE.
 export function drawFaceRound(g, w, h, expr, o = {}) {
   g.clearRect(0, 0, w, h);
   g.lineCap = 'round'; g.lineJoin = 'round';
-  const cx = w / 2, ey = h * 0.45, dx = w * 0.155, INK = '#2b2622';
+  const cx = w / 2, ey = h * 0.45, dx = w * (o.eyeGap || 0.155), INK = o.bold ? '#141212' : '#2b2622';
+  const LW = o.bold ? 1.45 : 1;
   const look = o.look || [0, 0];
   if (o.beard) { // Bart unter allem anderen
     g.fillStyle = o.beard; g.beginPath(); g.moveTo(cx - w * 0.3, h * 0.6);
@@ -790,12 +792,12 @@ export function drawFaceRound(g, w, h, expr, o = {}) {
     g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x + look[0] * rx * 0.45 - w * 0.012, ey + ry * 0.05 + look[1] * ry * 0.4, w * 0.011 * pup, 0, 7); g.fill();
     if (open < 1) { g.fillStyle = o.skin || '#f2f1ec'; g.fillRect(x - rx, ey - ry, rx * 2, ry * 2 * (1 - open)); g.strokeStyle = INK; g.lineWidth = w * 0.012; g.beginPath(); g.moveTo(x - rx, ey - ry + ry * 2 * (1 - open)); g.lineTo(x + rx, ey - ry + ry * 2 * (1 - open)); g.stroke(); }
     g.restore();
-    g.strokeStyle = INK; g.lineWidth = w * 0.012; g.beginPath(); g.ellipse(x, ey, rx, ry, 0, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = INK; g.lineWidth = w * 0.012 * LW; g.beginPath(); g.ellipse(x, ey, rx, ry, 0, 0, Math.PI * 2); g.stroke();
   };
   const closed = (x, up = true) => { g.strokeStyle = INK; g.lineWidth = w * 0.016; g.beginPath(); if (up) g.arc(x, ey + h * 0.035, w * 0.06, Math.PI * 1.15, Math.PI * 1.85); else g.arc(x, ey - h * 0.02, w * 0.06, Math.PI * 0.15, Math.PI * 0.85); g.stroke(); };
-  const brow = (x, y, ang, side) => { g.strokeStyle = o.browColor || INK; g.lineWidth = w * (o.bushy ? 0.034 : 0.018); g.beginPath(); g.moveTo(x - w * 0.07, y + side * ang * w * 0.06); g.lineTo(x + w * 0.07, y - side * ang * w * 0.06); g.stroke(); };
+  const brow = (x, y, ang, side) => { g.strokeStyle = o.browColor || INK; g.lineWidth = w * (o.bushy ? 0.034 : 0.018) * LW; g.beginPath(); g.moveTo(x - w * 0.07, y + side * ang * w * 0.06); g.lineTo(x + w * 0.07, y - side * ang * w * 0.06); g.stroke(); };
   const mouth = (kind) => {
-    const my = h * 0.72; g.strokeStyle = INK; g.lineWidth = w * 0.016; g.fillStyle = '#3a1f1f';
+    const my = h * 0.72; g.strokeStyle = INK; g.lineWidth = w * 0.016 * LW; g.fillStyle = '#3a1f1f';
     g.beginPath();
     if (kind === 'smile') { g.arc(cx, my - h * 0.05, w * 0.08, Math.PI * 0.2, Math.PI * 0.8); g.stroke(); }
     else if (kind === 'grin') { g.moveTo(cx - w * 0.1, my - h * 0.02); g.quadraticCurveTo(cx, my + h * 0.1, cx + w * 0.1, my - h * 0.02); g.closePath(); g.fill(); g.stroke(); }
@@ -822,7 +824,7 @@ export function drawFaceRound(g, w, h, expr, o = {}) {
     default: brow(cx - dx, by, 0, -1); brow(cx + dx, by, 0, 1); eye(cx - dx); eye(cx + dx); mouth('line');
   }
   if (o.mustache) { g.fillStyle = o.mustacheColor || '#d9d9d9'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(cx + sd * w * 0.06, h * 0.655, w * 0.075, h * 0.03, sd * 0.2, 0, Math.PI * 2); g.fill(); } }
-  if (o.glasses) { g.strokeStyle = o.glasses; g.lineWidth = w * 0.014; for (const x of [cx - dx, cx + dx]) { g.beginPath(); g.arc(x, ey, w * 0.115, 0, 7); g.stroke(); } g.beginPath(); g.moveTo(cx - dx + w * 0.115, ey); g.quadraticCurveTo(cx, ey - h * 0.03, cx + dx - w * 0.115, ey); g.stroke(); }
+  if (o.glasses) { g.strokeStyle = o.glasses; g.lineWidth = w * 0.014 * (o.bold ? 1.8 : 1); for (const x of [cx - dx, cx + dx]) { g.beginPath(); g.arc(x, ey, w * 0.115, 0, 7); g.stroke(); } g.beginPath(); g.moveTo(cx - dx + w * 0.115, ey); g.quadraticCurveTo(cx, ey - h * 0.03, cx + dx - w * 0.115, ey); g.stroke(); }
   if (o.wrinkles) { g.strokeStyle = 'rgba(60,50,45,0.45)'; g.lineWidth = w * 0.008; for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(cx + sd * (dx + w * 0.12), ey - h * 0.02); g.lineTo(cx + sd * (dx + w * 0.16), ey - h * 0.04); g.moveTo(cx + sd * (dx + w * 0.12), ey + h * 0.02); g.lineTo(cx + sd * (dx + w * 0.16), ey + h * 0.04); g.stroke(); } }
   if (o.blush) { g.fillStyle = 'rgba(240,120,120,0.35)'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(cx + sd * w * 0.27, h * 0.6, w * 0.06, h * 0.03, 0, 0, Math.PI * 2); g.fill(); } }
 }
@@ -886,4 +888,111 @@ export function hangLamp(x, y, z, { color = '#ffc98a', power = 4, cone = true, s
   const l = pointLight(color, power, [x, y - 0.25, z], 8);
   if (cone) lightCone([x, y - 0.12, z], { r: 1.1, h: y - 0.2, color });
   return l;
+}
+
+// ================================================================ Figuren im Cartoon-Stil der Vorlage 2 (v3)
+// Flacher heller Kopf mit dicker Kontur, schmaler Pillen-Oberkoerper, lange duenne Strich-Arme/-Beine, Frisuren.
+let flatGrad;
+function flatGradient() {
+  if (flatGrad) return flatGrad;
+  const d = new Uint8Array([205, 205, 205, 255, 236, 236, 236, 255, 255, 255, 255, 255]);
+  flatGrad = new THREE.DataTexture(d, 3, 1, THREE.RGBAFormat); flatGrad.minFilter = flatGrad.magFilter = THREE.NearestFilter; flatGrad.needsUpdate = true; return flatGrad;
+}
+export function flat(color, opts = {}) {
+  const m = new THREE.MeshToonMaterial({ color, gradientMap: flatGradient(), ...opts });
+  m.userData.outlineParameters = { thickness: opts.thick ?? 0.0085, color: [0.02, 0.02, 0.025] }; delete m.thick; return m;
+}
+const HIP = 0.86, TORSO = 0.72, HR = 0.42;
+export function makeChar2(o = {}) {
+  const C = Object.assign({ coat: '#c8443a', vest: null, skin: '#fbf1e1', limb: '#1b1a1d', hairStyle: null, hair: null, hat: 'none', hatColor: '#555', expr: 'smile', eyes: 'round', bold: true, scale: 1, dress: false }, o);
+  if (o.head) C.skin = o.head;
+  const root = new THREE.Group(); const parts = {};
+  const limbMat = flat(C.limb, { thick: 0.004 });
+  for (const s of [-1, 1]) {                                                // Beine
+    const hip = new THREE.Group(); hip.position.set(s * 0.1, HIP, 0); root.add(hip);
+    hip.add(mesh(new THREE.CylinderGeometry(0.027, 0.027, HIP - 0.05, 8), limbMat, { pos: [0, -(HIP - 0.05) / 2, 0] }));
+    hip.add(mesh(new THREE.SphereGeometry(0.06, 12, 8), limbMat, { pos: [0, -HIP + 0.04, 0.05], scale: [1, 0.7, 1.9] }));
+    parts[s < 0 ? 'legL' : 'legR'] = hip;
+  }
+  const body = new THREE.Group(); body.position.y = HIP; root.add(body); parts.body = body; parts.bodyY = HIP;
+  let torsoMat;
+  if (C.vest) {
+    const tex = canvasTex(256, 64, (c) => { c.fillStyle = C.vest; c.fillRect(0, 0, 256, 64); c.fillStyle = C.coat; c.fillRect(0, 0, 22, 64); c.fillRect(234, 0, 22, 64); c.fillStyle = 'rgba(0,0,0,0.25)'; c.fillRect(22, 0, 3, 64); c.fillRect(231, 0, 3, 64); });
+    torsoMat = flat('#ffffff', { map: tex });
+  } else torsoMat = flat(C.coat);
+  if (C.dress) {
+    const prof = [[0, 0], [0.34, 0], [0.3, 0.18], [0.24, 0.42], [0.23, 0.56], [0.19, 0.66], [0.1, 0.71], [0, 0.72]];
+    body.add(mesh(new THREE.LatheGeometry(prof.map(([x, y]) => new THREE.Vector2(x, y)), 28), torsoMat, { scale: [1, 1, 0.85] }));
+  } else {
+    body.add(mesh(new THREE.CapsuleGeometry(0.23, TORSO - 0.46, 8, 24), torsoMat, { pos: [0, TORSO / 2, 0], scale: [1, 1, 0.85] }));
+  }
+  if (C.pin) body.add(mesh(new THREE.SphereGeometry(0.045, 12, 8), flat(C.pin, { thick: 0.004 }), { pos: [0.09, TORSO * 0.62, 0.19], scale: [1, 1, 0.4] }));
+  for (const s of [-1, 1]) {                                                // Arme (Schulterdrehpunkt, Hand bei y -0.62)
+    const sh = new THREE.Group(); sh.position.set(s * 0.21, TORSO - 0.11, 0); body.add(sh);
+    sh.add(mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.6, 8), limbMat, { pos: [0, -0.3, 0] }));
+    sh.add(mesh(new THREE.SphereGeometry(0.05, 10, 8), limbMat, { pos: [0, -0.62, 0] }));
+    sh.rotation.z = s * 0.16; parts[s < 0 ? 'armL' : 'armR'] = sh;
+  }
+  parts.armZ = 0.16;
+  const headG = new THREE.Group(); headG.position.y = TORSO + HR * 0.86; body.add(headG); parts.head = headG; parts.headY = TORSO + HR * 0.86;
+  headG.add(mesh(new THREE.SphereGeometry(HR, 40, 28), flat(C.skin), { scale: [1, 1, 0.96] }));
+  const faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = 512;
+  const faceTex = new THREE.CanvasTexture(faceCanvas); faceTex.colorSpace = THREE.SRGBColorSpace; disposables.push(faceTex);
+  const faceMat = new THREE.MeshToonMaterial({ map: faceTex, transparent: true, gradientMap: flatGradient(), depthWrite: false }); noOutline(faceMat);
+  const fl = 1.9;
+  const face = new THREE.Mesh(new THREE.SphereGeometry(HR * 1.006, 48, 32, Math.PI / 2 - fl / 2, fl, Math.PI / 2 - fl / 2, fl), faceMat);
+  face.scale.set(1, 1, 0.96); face.renderOrder = 2; headG.add(face);
+  const setExpr = (e) => { drawFaceRound(faceCanvas.getContext('2d'), 512, 512, e, { ...C, skin: C.skin }); faceTex.needsUpdate = true; parts.expr = e; };
+  setExpr(C.expr);
+  // Frisuren
+  const hc = C.hair || '#c9c3bb';
+  if (C.hairStyle === 'spiky') {                                            // geschwungene Straehnen nach oben/hinten
+    const hm = flat(hc, { thick: 0.006 });
+    headG.add(mesh(new THREE.SphereGeometry(HR * 1.03, 28, 14, 0, Math.PI * 2, 0, 1.05), hm, { pos: [0, 0.01, -0.02] }));
+    const strands = [[-0.24, 0.3, 0.12, 0.5, 0.45], [-0.08, 0.36, 0.16, 0.62, 0.15], [0.1, 0.36, 0.14, 0.6, -0.15], [0.25, 0.3, 0.1, 0.5, -0.45],
+      [-0.16, 0.38, -0.08, 0.55, 0.3], [0.04, 0.42, -0.06, 0.66, 0], [0.2, 0.37, -0.1, 0.52, -0.3], [-0.02, 0.36, -0.24, 0.5, 0.05]];
+    for (const [x, y, z, len, rz] of strands) {
+      const c = mesh(new THREE.ConeGeometry(0.1, len, 5), hm, { pos: [x, y + len * 0.28, z - 0.06], rot: [-0.75, 0, rz], scale: [1, 1, 0.45] }); headG.add(c);
+    }
+  } else if (C.hairStyle === 'tufts') {
+    const hm = flat(hc, { thick: 0.005 });
+    for (const s of [-1, 1]) for (let i = 0; i < 3; i++) headG.add(mesh(new THREE.SphereGeometry(0.09, 12, 8), hm, { pos: [s * (HR - 0.02), 0.02 + i * 0.09, -0.05 - i * 0.04] }));
+  } else if (C.hairStyle === 'bun') {
+    const hm = flat(hc, { thick: 0.006 });
+    headG.add(mesh(new THREE.SphereGeometry(HR * 1.03, 28, 14, 0, Math.PI * 2, 0, 1.15), hm, { pos: [0, 0.0, -0.03] }));
+    headG.add(mesh(new THREE.SphereGeometry(0.15, 16, 12), hm, { pos: [0, HR + 0.08, -0.12] }));
+  }
+  if (C.hat && C.hat !== 'none') {                                          // vorhandene Huete auf Kopfgroesse skalieren
+    const tmp = makeChar({ hat: C.hat, hatColor: C.hatColor, coat: C.coat, expr: 'neutral' });
+    const h = tmp.userData.parts.hat || tmp.userData.parts.head.children.find((c, i) => i > 1 && c.geometry && c.geometry.type === 'SphereGeometry' && c.scale.y < 0.5);
+    if (C.hat === 'hood') { const hd = hood(C.coat); hd.scale.setScalar(HR / 0.5 * 1.02); headG.add(hd); }
+    else if (h) { h.parent.remove(h); h.position.multiplyScalar(HR / 0.5); h.scale.multiplyScalar(HR / 0.5); h.traverse((m) => { if (m.material) m.material = flat(m.material.color, { thick: 0.006 }); }); headG.add(h); parts.hat = h; }
+  }
+  root.userData = { parts, setExpr, cfg: C };
+  root.scale.setScalar(C.scale);
+  return root;
+}
+/** Haeuser-Details: Feuerleiter */
+export function fireEscape(x, y0, z, floors = 2, w = 1.6) {
+  const g = new THREE.Group(); g.position.set(x, y0, z); const m = toon('#1d1b22');
+  for (let f = 0; f < floors; f++) {
+    const y = 1.6 + f * 1.55;
+    g.add(box(w, 0.05, 0.6, m, { pos: [0, y, 0.3] }));
+    g.add(box(w, 0.04, 0.04, m, { pos: [0, y + 0.55, 0.6] }));
+    for (let i = 0; i <= 6; i++) g.add(box(0.025, 0.55, 0.025, m, { pos: [-w / 2 + i * w / 6, y + 0.28, 0.6] }));
+    g.add(box(0.05, 1.6, 0.05, m, { pos: [w / 2 - 0.15, y - 0.7, 0.35], rot: [0, 0, 0.5] }));
+  }
+  scene.add(g); return g;
+}
+/** Wimpelkette quer ueber die Strasse */
+export function bunting(x0, x1, y, z, colors = ['#e8343a', '#ffd21f', '#3f8bff', '#55c16a', '#ff8c42']) {
+  const g = new THREE.Group(); const n = Math.floor((x1 - x0) / 0.45);
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * 0.45, sag = Math.sin((i / n) * Math.PI) * 0.5;
+    const tri = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.32, 3), flat(colors[i % colors.length], { thick: 0.003 }));
+    tri.rotation.x = Math.PI; tri.position.set(x, y - sag - 0.16, z); g.add(tri);
+  }
+  const pts = []; for (let i = 0; i <= 40; i++) { const t = i / 40; pts.push(new THREE.Vector3(x0 + t * (x1 - x0), y - Math.sin(t * Math.PI) * 0.5, z)); }
+  g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: '#222' })));
+  scene.add(g); return g;
 }

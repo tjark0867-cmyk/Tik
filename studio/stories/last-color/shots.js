@@ -3,12 +3,12 @@ import { town } from '/stories/sock-thief/shots.js';
 import { houseFront } from '/stories/free-bread/shots.js';
 
 const YEL = '#f2c12e';
-const ARLO = { eyes: 'round', coat: '#5d77a8', hat: 'beret', hatColor: '#9a2f3a', head: '#f3dfc9', beard: '#fbfaf7', mustache: true, mustacheColor: '#ffffff',
-  glasses: '#3b3026', bushy: true, browColor: '#e9e4da', wrinkles: true, expr: 'smile', buttons: '#2f3a52', glove: '#f3dfc9' };
-const JUNE = { eyes: 'round', coat: YEL, dress: true, hair: '#c9c3bb', hat: 'none', head: '#f3dfc9', wrinkles: true, blush: true, expr: 'smile', glove: '#f3dfc9' };
-const JUNE_HOOD = { ...JUNE, hair: null, hat: 'hood' };
-const KEEPER = { eyes: 'round', coat: '#3d2b4a', dress: true, hair: '#a9a39b', hat: 'none', head: '#e9e1d6', glasses: '#d4aa3a', wrinkles: true, expr: 'stern', glove: '#e9e1d6' };
-const RICH = { eyes: 'round', coat: '#9b2f7a', hat: 'tophat', hatColor: '#1d1b22', head: '#f6e6d6', mustache: true, mustacheColor: '#3b2a1a', glasses: '#d4aa3a', expr: 'sneer', buttons: '#e2b93b', glove: '#ffffff' };
+const ARLO = { style: 'ch', hairStyle: 'tufts', hair: '#ece8e0', eyes: 'round', coat: '#5d77a8', hat: 'beret', hatColor: '#9a2f3a', head: '#f3dfc9', beard: '#fbfaf7', mustache: true, mustacheColor: '#ffffff',
+  glasses: '#141212', bushy: true, browColor: '#e9e4da', wrinkles: true, expr: 'smile', buttons: '#2f3a52', glove: '#f3dfc9' };
+const JUNE = { style: 'ch', hairStyle: 'bun', eyes: 'round', coat: YEL, dress: true, hair: '#cfc9c1', hat: 'none', head: '#f3dfc9', wrinkles: true, blush: true, expr: 'smile', glove: '#f3dfc9' };
+const JUNE_HOOD = { ...JUNE, hairStyle: null, hat: 'hood' };
+const KEEPER = { style: 'ch', hairStyle: 'bun', eyes: 'round', coat: '#3d2b4a', dress: true, hair: '#a9a39b', hat: 'none', head: '#efe7dc', glasses: '#141212', wrinkles: true, expr: 'stern', glove: '#e9e1d6' };
+const RICH = { style: 'ch', vest: '#e8dcc4', eyes: 'round', coat: '#9b2f7a', hat: 'tophat', hatColor: '#1d1b22', head: '#f6e6d6', mustache: true, mustacheColor: '#3b2a1a', glasses: '#141212', expr: 'sneer', buttons: '#e2b93b', glove: '#ffffff' };
 const JARS = ['#ff4b4b', '#ffd21f', '#3fd16a', '#3f8bff', '#ff8c42', '#b06bff', '#41e0d0', '#ff6fb5'];
 const v = (L, a) => new L.THREE.Vector3(...a);
 const NIGHT = { tint: [0.92, 0.96, 1.1], vignette: 0.6, contrast: 1.08 };
@@ -31,18 +31,18 @@ function colorShop(L, { liquid = '#3f8bff', fill = 0.4, arlo = true, keeper = tr
   L.hangLamp(0.4, 3.5, 2.0, { power: 5, color: '#ffc98a' });
   // Augen-Apparat
   const m = new L.THREE.Group(); m.position.set(-0.4, 1.06, 2.15); if (machine) L.scene.add(m);
-  m.add(L.box(0.5, 0.9, 0.4, '#c9a24a', { pos: [0, 0.45, 0] }));
-  m.add(L.box(0.56, 0.06, 0.46, '#8a6a2a', { pos: [0, 0.92, 0] }));
-  for (const sx of [-0.12, 0.12]) { m.add(L.cyl(0.07, 0.075, 0.15, '#2a2420', { pos: [sx, 0.79, 0.27], rot: [Math.PI / 2, 0, 0] }, 16)); m.add(L.cyl(0.05, 0.05, 0.01, '#9fd1ff', { pos: [sx, 0.79, 0.346], rot: [Math.PI / 2, 0, 0] }, 16)); }
+  m.add(L.box(0.5, 1.0, 0.4, '#c9a24a', { pos: [0, 0.5, 0] }));
+  m.add(L.box(0.56, 0.06, 0.46, '#8a6a2a', { pos: [0, 1.02, 0] }));
+  for (const sx of [-0.12, 0.12]) { m.add(L.cyl(0.07, 0.075, 0.15, '#2a2420', { pos: [sx, 0.9, 0.27], rot: [Math.PI / 2, 0, 0] }, 16)); m.add(L.cyl(0.05, 0.05, 0.01, '#9fd1ff', { pos: [sx, 0.9, 0.346], rot: [Math.PI / 2, 0, 0] }, 16)); }
   for (let i = 0; i < 3; i++) m.add(L.ball(0.035, ['#ff4b4b', '#ffd21f', '#3fd16a'][i], { pos: [0.16, 0.2 + i * 0.12, 0.21] }, 8));
   const jarG = L.jar(liquid, { fill, s: 1.2, glow: 1.4 }); jarG.position.set(-1.25, 1.06, 2.0); if (machine) L.scene.add(jarG);
   const stripe = L.canvasTex(64, 8, (c) => { c.fillStyle = '#fff'; c.fillRect(0, 0, 64, 8); c.fillStyle = 'rgba(255,255,255,0.25)'; for (let x = 0; x < 64; x += 16) c.fillRect(x, 0, 8, 8); }, { repeat: [6, 1] });
-  const path = new L.THREE.CatmullRomCurve3([v(L, [-0.65, 1.75, 2.15]), v(L, [-0.9, 2.2, 2.1]), v(L, [-1.25, 2.15, 2.0]), v(L, [-1.25, 1.85, 2.0])]);
+  const path = new L.THREE.CatmullRomCurve3([v(L, [-0.65, 1.8, 2.15]), v(L, [-0.9, 2.2, 2.1]), v(L, [-1.25, 2.15, 2.0]), v(L, [-1.25, 1.85, 2.0])]);
   const tubeMat = L.noOutline(new L.THREE.MeshBasicMaterial({ color: new L.THREE.Color(liquid).multiplyScalar(1.5), map: stripe }));
   if (tube && machine) L.scene.add(L.mesh(new L.THREE.TubeGeometry(path, 40, 0.035, 10, false), tubeMat, { shadow: false }));
   const out = { jar: jarG, stripe };
   if (keeper) out.keeper = L.place(L.makeChar(KEEPER), 0.5, 0.9, -0.1);
-  if (arlo) out.arlo = L.place(L.makeChar({ ...ARLO, expr: 'worried' }), -0.4, 3.1, Math.PI);   // Gesicht 0,125 vor den Okularen
+  if (arlo) out.arlo = L.place(L.makeChar({ ...ARLO, expr: 'worried' }), -0.4, 2.95, Math.PI);  // Gesicht 0,2 vor den Okularen, Koerper 0,2 vor der Theke
   return out;
 }
 function studio(L) {
@@ -166,19 +166,19 @@ export const shots = {
   },
   rich_side(L, dur) {
     richTown(L);
-    L.crowd(5, -4, 0.2, 2.0, 0.1, 7, { ry: 0, cfg: { eyes: 'round', expr: 'happy' } });
+    L.crowd(5, -4, 0.2, 2.0, 0.1, 7, { ry: 0, cfg: { style: 'ch', eyes: 'round', expr: 'happy' } });
     return (t) => L.camMove(t / dur, { from: [-3, 4.5, 11], to: [2, 3.2, 9.5], look: [0, 2.6, -2] });
   },
   poor_side(L, dur) {
     poorTown(L);
-    const p = L.crowd(4, -3.5, -0.5, 2.2, 0.2, 9, { ry: 0.2, cfg: { eyes: 'round', expr: 'sad', coat: '#7d7d7d' } });
+    const p = L.crowd(4, -3.5, -0.5, 2.2, 0.2, 9, { ry: 0.2, cfg: { style: 'ch', eyes: 'round', expr: 'sad', coat: '#7d7d7d', hairStyle: 'tufts' } });
     const rn = L.rain({ cz: 0.5, x: 8, z: 4, y: 8, color: '#d8d4c8' });
     return (t) => { rn(t); p.forEach((c) => L.pose(c, { t: t + c.userData.phase })); L.camMove(t / dur, { from: [2, 2.6, 9], to: [-1, 2.3, 8.2], look: [0, 1.8, -1.5] }); };
   },
   poor_kid(L, dur) {
     poorTown(L);
-    const mom = L.place(L.makeChar({ eyes: 'round', coat: '#8a8478', dress: true, hair: '#5a4a3a', hat: 'none', expr: 'talk' }), -0.6, -0.2, 0.35, 0.12);
-    const kid = L.place(L.makeChar({ eyes: 'round', coat: '#7d8a9a', hat: 'none', hair: '#3a2a1a', expr: 'surprised', scale: 0.68 }), 0.55, 0.1, -0.4, 0.12);   // 1,2 Abstand
+    const mom = L.place(L.makeChar({ style: 'ch', hairStyle: 'bun', eyes: 'round', coat: '#8a8478', dress: true, hair: '#5a4a3a', hat: 'none', expr: 'talk' }), -0.6, -0.2, 0.35, 0.12);
+    const kid = L.place(L.makeChar({ style: 'ch', hairStyle: 'spiky', eyes: 'round', coat: '#7d8a9a', hat: 'none', hair: '#3a2a1a', expr: 'surprised', scale: 0.7 }), 0.55, 0.1, -0.4, 0.12);   // 1,2 Abstand
     return (t) => { L.pose(mom, { t, armR: [-2.3, 0.3] }); L.pose(kid, { t }); if (Math.floor(t * 6) % 2) mom.userData.setExpr('talk'); else mom.userData.setExpr('smile');
       L.camMove(t / dur, { from: [0.2, 1.5, 4.2], to: [0.1, 1.55, 3.6], look: [0, 1.4, 0] }); L.dof(3.7, 0.003, 0.01); };
   },
@@ -215,8 +215,8 @@ export const shots = {
   },
   june_bed(L, dur) {
     bedroom(L);
-    const a = L.place(L.makeChar({ ...ARLO, expr: 'worried' }), 1.05, 1.8, -Math.PI / 2 + 0.25);  // 0,65 zur Bettkante (x 0.4)
-    return (t) => { L.pose(a, { t }); L.camMove(t / dur, { from: [2.4, 3.7, 3.9], to: [2.2, 3.5, 3.5], look: [0.2, 1.4, 1.2], fov: 55 }); L.dof(3.2, 0.002, 0.008); };
+    const a = L.place(L.makeChar({ ...ARLO, expr: 'worried' }), -2.05, 1.3, Math.PI / 2 - 0.2);  // andere Bettseite, 0,45 zur Bettkante (x -1.6)
+    return (t) => { L.pose(a, { t }); L.camMove(t / dur, { from: [1.9, 3.3, 3.8], to: [1.7, 3.1, 3.4], look: [-0.9, 1.4, 1.0], fov: 50 }); L.dof(3.4, 0.002, 0.008); };
   },
   pharmacy(L, dur) {
     nightBase(L, '#132a2a', 0.03); L.grade({ ...NIGHT, tint: [0.92, 1.05, 1.0] });
@@ -255,7 +255,7 @@ export const shots = {
     let off = false;
     return (t) => { const u = t / dur;
       if (u > 0.45 && !off) { off = true; k.userData.cfg.glasses = null; k.userData.setExpr('sad'); gl.visible = true; }
-      L.pose(k, { t, armR: u > 0.45 ? [-2.3, -0.6] : [-2.5 * L.ease(u / 0.45), -0.45] });
+      L.pose(k, { t, armR: u > 0.45 ? [-1.6, -0.35] : [-2.2 * L.ease(u / 0.45), -0.4] });           // Brille unter dem Kinn, vor der Brust
       L.camMove(u, { from: [0.7, 2.0, 3.6], to: [0.6, 1.98, 3.1], look: [0.5, 1.85, 0.9] }); L.dof(2.2, 0.004, 0.012); };
   },
   keeper_talk(L, dur) {
@@ -265,7 +265,7 @@ export const shots = {
   },
   arlo_close(L, dur) {
     const S = colorShop(L, { keeper: false, tube: false, machine: false }); S.arlo.rotation.y = Math.PI; S.arlo.userData.setExpr('sad');
-    return (t) => { L.pose(S.arlo, { t }); L.camMove(t / dur, { from: [0.15, 1.97, 0.75], to: [0.05, 1.95, 1.05], look: [-0.4, 1.85, 3.1] }); L.dof(2.2, 0.004, 0.012); };
+    return (t) => { L.pose(S.arlo, { t }); L.camMove(t / dur, { from: [0.15, 1.97, 0.75], to: [0.05, 1.95, 1.05], look: [-0.4, 1.95, 2.95] }); L.dof(2.2, 0.004, 0.012); };
   },
   sell_yellow(L, dur) {
     const S = colorShop(L, { liquid: '#ffd21f', fill: 0.05 });
