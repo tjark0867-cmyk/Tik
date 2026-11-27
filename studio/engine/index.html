@@ -10,11 +10,16 @@ const mod = await import(`/stories/${story}/shots.js`);
 await L.loadFonts();
 const qs = new URLSearchParams(location.search);
 L.init(document.getElementById('c'), +(qs.get('w') || 720), +(qs.get('h') || 1280));
-let update = null, dur = 1;
+let update = null, dur = 1, dis = 0;
+const gl = document.getElementById('c');
+const prev = document.createElement('canvas'), out = document.createElement('canvas');
+prev.width = out.width = L.W; prev.height = out.height = L.H;
 window.studio = {
   shots: Object.keys(mod.shots),
-  build(id, d) { dur = d; update = mod.shots[id](L, d); return true; },
-  frame(t, q, cam) { update(t, dur); if (cam) { L.camera.position.set(cam[0], cam[1], cam[2]); L.camera.lookAt(cam[3], cam[4], cam[5]); } L.render(); return L.snapshot(q); },
+  build(id, d, dissolve = 0) { dis = dissolve; if (dis) prev.getContext('2d').drawImage(gl, 0, 0); dur = d; update = mod.shots[id](L, d); return true; },
+  frame(t, q, cam) { update(t, dur); L.post.time = t; if (cam) { L.camera.position.set(cam[0], cam[1], cam[2]); L.camera.lookAt(cam[3], cam[4], cam[5]); } L.render(t);
+    if (dis && t < dis) { const c = out.getContext('2d'); c.globalAlpha = 1; c.drawImage(gl, 0, 0); c.globalAlpha = 1 - t / dis; c.drawImage(prev, 0, 0); c.globalAlpha = 1; return out.toDataURL('image/jpeg', q); }
+    return L.snapshot(q); },
 };
 window.ready = true;
 </script></body></html>

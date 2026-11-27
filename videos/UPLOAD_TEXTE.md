@@ -48,3 +48,25 @@ Every house in town finds a warm loaf of bread on the doorstep. Every single day
 ```
 Would you have eaten the free bread? 🍞👀
 ```
+
+---
+
+## 03 · The Last Color  (`03_the-last-color.mp4`)
+
+**YouTube-Shorts-Titel**
+```
+He Sold Every Color in His Eyes to Save Her 💛
+```
+**TikTok-Beschreibung**
+```
+In this city, colors are money… and he sold every last one for her 💛 #story #animation #storytime #sad #fyp
+```
+**YouTube-Beschreibung**
+```
+In this city, colors are money. Sell green, and every tree turns gray. An old painter sells his colors one by one to save his wife… until only yellow is left.
+#shorts #animation #story
+```
+**Angepinnter Kommentar**
+```
+Which color would you never sell? 🎨
+```

@@ -112,19 +112,61 @@ def music(duration, sr=44100, bpm=104, seed=3):
     return (out * 0.8).astype(np.float32), sr
 
 
+def music_piano(duration, sr=44100, bpm=70, seed=5):
+    """Ruhige, emotionale Klavier-Arpeggien (Am – F – C – G) mit weichem Flaechenklang."""
+    n = int(duration * sr)
+    out = np.zeros(n + sr * 6)
+    beat = 60 / bpm
+    hz = lambda m: 440 * 2 ** ((m - 69) / 12)
+
+    def piano(freq, t0, amp, length=2.6):
+        i0 = int(t0 * sr)
+        tt = np.arange(int(length * sr)) / sr
+        env = np.exp(-tt / 0.9) * np.minimum(1, tt / 0.006)
+        sig = sum(a * np.sin(2 * np.pi * freq * k * (1 + 0.0004 * k * k) * tt) * np.exp(-tt * k * 0.6)
+                  for k, a in [(1, 1.0), (2, 0.45), (3, 0.22), (4, 0.12), (5, 0.06)])
+        seg = out[i0:i0 + len(tt)]
+        seg += (amp * env * sig)[: len(seg)]
+
+    chords = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]]  # Am F C G
+    pattern = [0, 1, 2, 1, 0 + 12, 2, 1, 2]
+    t, bar = 0.0, 0
+    while t < duration + 2:
+        ch = chords[bar % 4]
+        piano(hz(ch[0] - 12), t, 0.5, 4.0)
+        for k, idx in enumerate(pattern):
+            m = ch[idx % 3] + (12 if idx >= 12 else 0) + 12
+            piano(hz(m), t + k * beat / 2, 0.22 + 0.05 * (k == 0))
+        if bar >= 2 and bar % 2 == 0:
+            piano(hz(ch[2] + 24), t + beat * 2, 0.12, 3.0)
+        # weiche Flaeche
+        i0 = int(t * sr); L = int(beat * 4 * sr); tt = np.arange(L) / sr
+        pad = sum(np.sin(2 * np.pi * hz(m) * tt) for m in ch) * 0.05 * np.sin(np.pi * tt / (beat * 4)) ** 2
+        out[i0:i0 + L] += pad[: len(out[i0:i0 + L])]
+        t += beat * 4
+        bar += 1
+    out = out[:n]
+    fade = int(2.0 * sr)
+    out[-fade:] *= np.linspace(1, 0, fade)
+    out[: int(0.5 * sr)] *= np.linspace(0, 1, int(0.5 * sr))
+    out /= np.max(np.abs(out)) + 1e-9
+    return (out * 0.8).astype(np.float32), sr
+
+
 def main(story):
     sdir = ROOT / "stories" / story
     out = sdir / "out"
     tl = json.loads((out / "timeline.json").read_text())
     dur = tl["frames"] / tl["fps"]
     n = write_ass(tl["words"], out / "captions.ass", dur)
-    m, sr = music(dur)
+    style = json.loads((sdir / "story.json").read_text()).get("music", "pizzicato")
+    m, sr = music_piano(dur) if style == "piano" else music(dur)
     sf.write(out / "music.wav", m, sr)
     final = sdir / f"{story}.mp4"
     fc = (
         "[0:v]scale=1080:1920:flags=lanczos,vignette=angle=PI/5:mode=forward,"
         f"ass={out / 'captions.ass'},format=yuv420p[v];"
-        "[1:a]aresample=44100,asplit=2[vo][vk];[2:a]volume=0.13[mu];"
+        f"[1:a]aresample=44100,asplit=2[vo][vk];[2:a]volume={0.2 if style == 'piano' else 0.13}[mu];"
         "[mu][vk]sidechaincompress=threshold=0.05:ratio=4:attack=20:release=300[duck];"
         "[vo][duck]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-12.3:TP=-1.2:LRA=11,aresample=44100[a]"
     )

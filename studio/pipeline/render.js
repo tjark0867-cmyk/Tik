@@ -47,7 +47,7 @@ function serve() {
   const t0 = Date.now(); let total = 0;
   for (const shot of timeline.shots) {
     const frames = shot.frames;
-    await page.evaluate(([id, d]) => window.studio.build(id, d), [shot.id, frames / FPS]);
+    await page.evaluate(([id, d, x]) => window.studio.build(id, d, x), [shot.id, frames / FPS, shot.dissolve || 0]);
     for (let i = 0; i < frames; i++) {
       const url = await page.evaluate((t) => window.studio.frame(t, 0.93), i / FPS);
       const buf = Buffer.from(url.slice(url.indexOf(',') + 1), 'base64');

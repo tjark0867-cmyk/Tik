@@ -16,7 +16,13 @@ Feedback: Die Stimme soll wie im Vorlage-Video klingen – **einladender, wärme
 - Vorlage: männlicher Erzähler, ca. 183 Wörter/Min., mittlere Stimmlage (Grundton ≈ 155 Hz), warmer, leicht verschmitzter Erzählton mit Spannung in den Pausen.
 - Vor dem nächsten Video: **3–4 Stimmproben** desselben Absatzes erzeugen (z. B. Kokoro `bm_george`, `bm_fable`, `am_puck`, `am_fenrir` sowie Mischungen) und den Nutzer **wählen lassen**, bevor gerendert wird. Ich kann Audio nicht selbst anhören.
 - **Entscheidung (Video #2): Nutzer hat `am_puck` gewählt** – Standardstimme für alle weiteren Videos, Tempo ≈ 183 Wörter/Min.
+- **Entscheidung (Vorlage 2 „Every Memory Has a Price“): `am_eric`, Tempo ≈ 228 Wörter/Min., kaum Pausen** – Standard für Videos im filmischen Stil der Vorlage 2.
 - Wenn keine Kokoro-Stimme nah genug herankommt: ElevenLabs vorschlagen (Nutzer gibt API-Key über das sichere Formular).
+
+## Vorlage 2 – filmischer Stil ("Every Memory Has a Price")
+- Starke Lichtstimmung (warme Lampen in blauer Nacht), Leuchten (Bloom), Tiefenunschärfe, Nebel, Vignette, Filmkorn.
+- Figuren mit großen runden Augen (Cartoon-Stil), ausdrucksstarke Mimik (Tränen, Sorgen, Staunen).
+- Story: Welt mit einer besonderen Regel → Familie in Not → Opfer steigert sich → Warnung → tragischer Twist. Ca. 290 Wörter / 75–80 s.
 
 ## Allgemein
 - Keine OpenArt-Credits verwenden – alles selbst mit dem Studio erzeugen (Wunsch des Nutzers).

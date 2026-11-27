@@ -1,0 +1,234 @@
+{
+  "title": "The Last Color",
+  "voice": "am_eric",
+  "speed": 1.11,
+  "tail": 2.4,
+  "music": "piano",
+  "post": true,
+  "pauses": {
+    "comma": 0.05,
+    "stop": 0.13,
+    "question": 0.2
+  },
+  "beats": [
+    {
+      "text": "An old painter sold every color in his eyes to save his wife.",
+      "shots": [
+        "hook_extract"
+      ]
+    },
+    {
+      "text": "You see, in this city, colors are money.",
+      "shots": [
+        "city_night"
+      ],
+      "dissolve": 0.35
+    },
+    {
+      "text": "There's a shop on every corner that'll pull a color right out of your eyes.",
+      "shots": [
+        "shop_sign",
+        "machine_close"
+      ]
+    },
+    {
+      "text": "Sell green, and every tree you ever see turns gray.",
+      "shots": [
+        "park_green"
+      ]
+    },
+    {
+      "text": "Sell red, and roses look like ash.",
+      "shots": [
+        "roses_red"
+      ]
+    },
+    {
+      "text": "The rich buy colors by the bucket.",
+      "shots": [
+        "rich_bucket"
+      ]
+    },
+    {
+      "text": "Their side of the river glows like a candy store.",
+      "shots": [
+        "rich_side"
+      ]
+    },
+    {
+      "text": "On the other side, everything looks like an old newspaper.",
+      "shots": [
+        "poor_side"
+      ]
+    },
+    {
+      "text": "Parents there tell their kids what blue used to look like.",
+      "shots": [
+        "poor_kid"
+      ]
+    },
+    {
+      "text": "Arlo was a painter, so he never sold a single color.",
+      "shots": [
+        "studio_wide",
+        "palette"
+      ],
+      "dissolve": 0.35
+    },
+    {
+      "text": "And his favorite was yellow.",
+      "shots": [
+        "yellow_paint"
+      ]
+    },
+    {
+      "text": "The color of his wife's raincoat.",
+      "shots": [
+        "june_rain"
+      ]
+    },
+    {
+      "text": "The color of the sunflowers she planted every spring.",
+      "shots": [
+        "june_garden"
+      ]
+    },
+    {
+      "text": "Then June got sick.",
+      "shots": [
+        "june_bed"
+      ],
+      "dissolve": 0.4
+    },
+    {
+      "text": "And her medicine costs one color a week.",
+      "shots": [
+        "pharmacy"
+      ]
+    },
+    {
+      "text": "So Arlo sells green.",
+      "shots": [
+        "sell_green"
+      ]
+    },
+    {
+      "text": "Then blue.",
+      "shots": [
+        "sell_blue"
+      ]
+    },
+    {
+      "text": "Then red.",
+      "shots": [
+        "sell_red"
+      ]
+    },
+    {
+      "text": "His paintings fade to gray, one by one.",
+      "shots": [
+        "paintings_fade"
+      ]
+    },
+    {
+      "text": "Until there's only one color left.",
+      "shots": [
+        "ledger_arlo"
+      ]
+    },
+    {
+      "text": "Yellow.",
+      "shots": [
+        "jar_yellow"
+      ]
+    },
+    {
+      "text": "And the old woman behind the counter takes off her glasses and says,",
+      "shots": [
+        "keeper_glasses"
+      ]
+    },
+    {
+      "text": "Son, after this, you'll never see her raincoat again.",
+      "shots": [
+        "keeper_talk",
+        "arlo_close"
+      ]
+    },
+    {
+      "text": "He sells it anyway.",
+      "shots": [
+        "sell_yellow"
+      ]
+    },
+    {
+      "text": "And it pays for everything.",
+      "shots": [
+        "june_better"
+      ]
+    },
+    {
+      "text": "A month later, June comes home, healthy, hiding something behind her back.",
+      "shots": [
+        "june_door"
+      ],
+      "dissolve": 0.4
+    },
+    {
+      "text": "A tiny glass jar, glowing gold.",
+      "shots": [
+        "jar_reveal"
+      ]
+    },
+    {
+      "text": "I bought your yellow back, she says.",
+      "shots": [
+        "june_smile"
+      ]
+    },
+    {
+      "text": "Now you can paint my sunflowers again.",
+      "shots": [
+        "june_smile2"
+      ]
+    },
+    {
+      "text": "And for the first time in months, Arlo sees her raincoat shine.",
+      "shots": [
+        "arlo_pov_raincoat",
+        "arlo_tears"
+      ]
+    },
+    {
+      "text": "Then he notices her squinting at the jar, like she can't tell what color it is.",
+      "shots": [
+        "june_squint"
+      ]
+    },
+    {
+      "text": "She sold every color she had to buy his back.",
+      "shots": [
+        "ledger_june"
+      ]
+    },
+    {
+      "text": "Green. Blue. Red. And her yellow, too.",
+      "shots": [
+        "ledger_stamps"
+      ]
+    },
+    {
+      "text": "Every spring, she still plants sunflowers.",
+      "shots": [
+        "garden_gray"
+      ],
+      "dissolve": 0.4
+    },
+    {
+      "text": "And he's the only one who can see them.",
+      "shots": [
+        "garden_final"
+      ]
+    }
+  ]
+}

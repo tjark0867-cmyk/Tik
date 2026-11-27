@@ -30,15 +30,18 @@ def trim(a, thr=0.012, pad=0.03, sr=24000):
     return a[s:e]
 
 
+PAUSE = {"comma": 0.08, "question": 0.26, "stop": 0.2}
+
+
 def pause_after(text, last):
     if last:
         return CFG_TAIL or TAIL
     t = text.strip()
     if t.endswith(","):
-        return 0.08
+        return PAUSE["comma"]
     if t.endswith("?"):
-        return 0.26
-    return 0.2
+        return PAUSE["question"]
+    return PAUSE["stop"]
 
 
 def words_of(text):
@@ -66,6 +69,7 @@ def main(story):
     cfg = json.loads((sdir / "story.json").read_text())
     global CFG_TAIL
     CFG_TAIL = cfg.get("tail")
+    PAUSE.update(cfg.get("pauses", {}))
     out = sdir / "out"
     out.mkdir(parents=True, exist_ok=True)
     kok = Kokoro(str(ROOT / "models/kokoro-v1.0.onnx"), str(ROOT / "models/voices-v1.0.bin"))
@@ -96,9 +100,9 @@ def main(story):
         ws = b.get("weights") or [1] * len(b["shots"])
         acc = bt["start"] if bt is not beats[0] else 0.0
         span = bt["end"] - acc
-        for sid, wgt in zip(b["shots"], ws):
+        for k, (sid, wgt) in enumerate(zip(b["shots"], ws)):
             dur = span * wgt / sum(ws)
-            shots.append({"id": sid, "t0": acc, "t1": acc + dur})
+            shots.append({"id": sid, "t0": acc, "t1": acc + dur, "dissolve": b.get("dissolve", 0) if k == 0 else 0})
             acc += dur
     total = 0
     for s in shots:
@@ -106,7 +110,7 @@ def main(story):
         s["frames"] = f1 - total
         total = f1
     timeline = {"fps": FPS, "duration": len(voice) / sr, "frames": total,
-                "shots": [{"id": s["id"], "frames": s["frames"], "start": round(s["t0"], 3)} for s in shots], "words": words}
+                "shots": [{"id": s["id"], "frames": s["frames"], "start": round(s["t0"], 3), "dissolve": s["dissolve"]} for s in shots], "words": words}
     (out / "timeline.json").write_text(json.dumps(timeline, indent=1))
     print(f"Stimme: {len(voice) / sr:.1f}s, {len(words)} Wörter, {exact}/{len(beats)} Beats exakt per Whisper, {len(shots)} Einstellungen")
 

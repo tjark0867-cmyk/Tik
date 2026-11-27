@@ -10,7 +10,7 @@ const MORNING = { top: '#f7b77a', bottom: '#fff1d6' };
 
 // ------------------------------------------------------------ Bausteine
 /** Hausfront mit echter Tueroeffnung (x -0.65..0.65, Hoehe 2.7), Front bei lokal z = 0. */
-function houseFront(L, x, color, { open = 0, night = false, loaf = false, seed = 1 } = {}) {
+export function houseFront(L, x, color, { open = 0, night = false, loaf = false, seed = 1 } = {}) {
   const T = L.THREE, g = new T.Group(); g.position.set(x, 0.12, -1.5);
   const wall = L.toon(color), trim = '#f1e6d2';
   g.add(L.box(0.95, 4.4, 0.3, wall, { pos: [-1.125, 2.2, -0.15] }));

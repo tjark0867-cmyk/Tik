@@ -2,6 +2,12 @@
 // "gemuetliche Diorama-Stadt, runde weisse Meme-Gesichter, schwarze Umrisse".
 import * as THREE from 'three';
 import { OutlineEffect } from './OutlineEffect.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { Pass } from 'three/addons/postprocessing/Pass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 export { THREE };
 
@@ -19,6 +25,7 @@ export function init(canvas, w = 720, h = 1280) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   effect = new OutlineEffect(renderer, { defaultThickness: 0.0055, defaultColor: [0.06, 0.05, 0.05], defaultAlpha: 1 });
+  setupPost();
 }
 
 export function newScene({ bg = '#87b5d8', fog = null } = {}) {
@@ -27,10 +34,17 @@ export function newScene({ bg = '#87b5d8', fog = null } = {}) {
   scene.background = new THREE.Color(bg);
   if (fog) scene.fog = new THREE.Fog(fog.color, fog.near, fog.far);
   camera = new THREE.PerspectiveCamera(38, W / H, 0.05, 400);
+  if (composer) { toonPass.scene = scene; toonPass.camera = camera; bokehPass.scene = scene; bokehPass.camera = camera; }
+  grade(); bloom(); dof(0);
   return scene;
 }
 
-export function render() { effect.render(scene, camera); }
+export function render(t = 0) {
+  if (!post.on) { effect.render(scene, camera); return; }
+  gradePass.uniforms.time.value = t;
+  bokehPass.enabled = post.dof > 0;
+  composer.render();
+}
 
 export function snapshot(quality = 0.92) {
   return renderer.domElement.toDataURL('image/jpeg', quality);
@@ -273,7 +287,7 @@ export function makeChar(o = {}) {
   const fl = 1.9;
   const face = new THREE.Mesh(new THREE.SphereGeometry(0.503, 48, 32, Math.PI / 2 - fl / 2, fl, Math.PI / 2 - fl / 2, fl), faceMat);
   face.scale.set(1, 0.93, 0.95); face.renderOrder = 2; headG.add(face);
-  const setExpr = (e) => { drawFace(faceCanvas.getContext('2d'), 512, 512, e, C); faceTex.needsUpdate = true; parts.expr = e; };
+  const setExpr = (e) => { (C.eyes === 'round' ? drawFaceRound : drawFace)(faceCanvas.getContext('2d'), 512, 512, e, { ...C, skin: C.head }); faceTex.needsUpdate = true; parts.expr = e; };
   setExpr(C.expr);
   // Haare / Huete
   const top = 0.46;
@@ -311,6 +325,10 @@ export function makeChar(o = {}) {
     hat.add(cyl(0.37, 0.37, 0.2, '#ffffff', { pos: [0, 0.1, 0] }, 28));
     for (const [x, y, z, r] of [[0, 0.36, 0, 0.27], [0.2, 0.32, 0.08, 0.2], [-0.2, 0.32, 0.06, 0.2], [0.05, 0.33, -0.2, 0.2]]) hat.add(ball(r, '#ffffff', { pos: [x, y, z] }, 18));
     headG.add(hat); parts.hat = hat;
+  } else if (C.hat === 'tophat') {
+    const hat = topHat(hc); hat.position.set(0, top - 0.03, 0); hat.rotation.z = 0.05; headG.add(hat); parts.hat = hat;
+  } else if (C.hat === 'hood') {
+    headG.add(hood(C.coat));
   } else if (C.hat === 'beret') {
     headG.add(ball(0.48, hc, { pos: [0.06, top - 0.04, 0], scale: [1.05, 0.28, 1.05] }, 24));
   }
@@ -660,7 +678,7 @@ export function crowd(n, x0, z0, dx, dz, seed = 11, opts = {}) {
     const ch = makeChar({ coat: coats[Math.floor(r() * coats.length)], hat: female ? 'none' : hats[Math.floor(r() * hats.length)], hatColor: ['#3d3d46', '#6b4a35', '#4f5d7a'][Math.floor(r() * 3)],
       dress: female, hair: female ? ['#6b3f22', '#2e2420', '#c98b3d'][Math.floor(r() * 3)] : null, mustache: !female && r() < 0.4,
       expr: opts.expr || ['neutral', 'smug', 'happy'][Math.floor(r() * 3)],
-      socks: opts.mismatched ? [sockCols[Math.floor(r() * 6)], sockCols[Math.floor(r() * 6)]] : null, scale: 0.92 + r() * 0.16 });
+      socks: opts.mismatched ? [sockCols[Math.floor(r() * 6)], sockCols[Math.floor(r() * 6)]] : null, scale: 0.92 + r() * 0.16, ...(opts.cfg || {}) });
     place(ch, x0 + dx * i + (r() - 0.5) * 0.3, z0 + dz * i + (r() - 0.5) * 0.3, opts.ry ?? 0);
     ch.userData.phase = r() * 10; out.push(ch);
   }
@@ -683,4 +701,189 @@ export function loaf(s = 1, color = '#d9964a') {
   g.add(ball(0.34, color, { pos: [0, 0.187, 0], scale: [1, 0.55, 0.58] }, 24));
   for (const x of [-0.15, 0, 0.15]) g.add(box(0.035, 0.02, 0.2, '#f3d29a', { pos: [x, 0.37, 0], rot: [0, 0.5, 0], shadow: false }));
   g.scale.setScalar(s); return g;
+}
+
+// ================================================================ Filmische Nachbearbeitung (v2)
+export const post = { on: false, dof: 0 };
+let composer, toonPass, bloomPass, bokehPass, gradePass;
+class ToonRenderPass extends Pass {
+  constructor() { super(); this.needsSwap = false; this.scene = null; this.camera = null; }
+  render(r, writeBuffer, readBuffer) { r.setRenderTarget(this.renderToScreen ? null : readBuffer); r.clear(); effect.render(this.scene, this.camera); }
+}
+const GradeShader = {
+  uniforms: { tDiffuse: { value: null }, sat: { value: 1 }, contrast: { value: 1 }, bright: { value: 1 }, tint: { value: new THREE.Vector3(1, 1, 1) },
+    vignette: { value: 0.45 }, grain: { value: 0.03 }, time: { value: 0 }, sepia: { value: 0 }, mono: { value: 0 },
+    remove: { value: new THREE.Vector4(0, 0, 0, 0) }, keep: { value: new THREE.Vector4(0, 0, 0, 0) }, lift: { value: new THREE.Vector3(0, 0, 0) } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `
+    uniform sampler2D tDiffuse; uniform float sat, contrast, bright, vignette, grain, time, sepia, mono; uniform vec3 tint, lift; uniform vec4 remove, keep;
+    varying vec2 vUv;
+    vec3 rgb2hsv(vec3 c){ vec4 K=vec4(0.,-1./3.,2./3.,-1.); vec4 p=mix(vec4(c.bg,K.wz),vec4(c.gb,K.xy),step(c.b,c.g)); vec4 q=mix(vec4(p.xyw,c.r),vec4(c.r,p.yzx),step(p.x,c.r)); float d=q.x-min(q.w,q.y); return vec3(abs(q.z+(q.w-q.y)/(6.*d+1e-10)),d/(q.x+1e-10),q.x); }
+    float band(float h, float c, float w){ float d=abs(h-c); d=min(d,1.-d); return 1.-smoothstep(w*0.6, w, d); }
+    void main(){
+      vec3 col = texture2D(tDiffuse, vUv).rgb;
+      vec3 srgb = pow(clamp(col, 0., 1.), vec3(1./2.2));
+      vec3 hsv = rgb2hsv(srgb);
+      vec4 b = vec4(band(hsv.x, 0.0, 0.06), band(hsv.x, 0.135, 0.055), band(hsv.x, 0.33, 0.11), band(hsv.x, 0.6, 0.12));
+      float chroma = smoothstep(0.12, 0.3, hsv.y);
+      float yellowOk = smoothstep(0.45, 0.65, hsv.z);
+      b.y *= yellowOk;
+      float kept = max(max(keep.x*b.x, keep.y*b.y), max(keep.z*b.z, keep.w*b.w)) * chroma;
+      float m = max(max(remove.x*b.x, remove.y*b.y), max(remove.z*b.z, remove.w*b.w)) * chroma;
+      m = max(m, mono * (1. - kept));
+      float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+      col = mix(col, vec3(lum), clamp(m, 0., 1.));
+      lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+      col = mix(vec3(lum), col, sat);
+      col = mix(col, vec3(lum) * vec3(1.08, 0.98, 0.82), sepia);
+      col = col + lift * (1. - col);
+      col = (col - 0.5) * contrast + 0.5; col *= bright * tint;
+      float v = smoothstep(0.95, 0.25, length((vUv - 0.5) * vec2(1.0, 1.25)));
+      col *= mix(1., v, vignette);
+      float n = fract(sin(dot(vUv * vec2(1280., 720.) + fract(time * 7.13) * 91.7, vec2(12.9898, 78.233))) * 43758.5453);
+      col += (n - 0.5) * grain;
+      gl_FragColor = vec4(max(col, 0.), 1.);
+    }`,
+};
+function setupPost() {
+  composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, samples: 4 }));
+  composer.setPixelRatio(1); composer.setSize(W, H);
+  toonPass = new ToonRenderPass(); composer.addPass(toonPass);
+  bokehPass = new BokehPass(new THREE.Scene(), new THREE.PerspectiveCamera(), { focus: 5, aperture: 0.002, maxblur: 0.008 }); composer.addPass(bokehPass);
+  bloomPass = new UnrealBloomPass(new THREE.Vector2(W / 2, H / 2), 0.55, 0.6, 0.82); composer.addPass(bloomPass);
+  gradePass = new ShaderPass(GradeShader); composer.addPass(gradePass);
+  composer.addPass(new OutputPass());
+}
+/** Farb-Grading. remove/keep: {r,y,g,b} 0..1; mono: alles ausser keep entsaettigen. */
+export function grade({ sat = 1, contrast = 1.05, bright = 1, tint = [1, 1, 1], vignette = 0.45, grain = 0.035, sepia = 0, mono = 0, remove = {}, keep = {}, lift = [0, 0, 0] } = {}) {
+  if (!gradePass) return;
+  const U = gradePass.uniforms;
+  U.sat.value = sat; U.contrast.value = contrast; U.bright.value = bright; U.tint.value.set(...tint); U.vignette.value = vignette; U.grain.value = grain;
+  U.sepia.value = sepia; U.mono.value = mono; U.lift.value.set(...lift);
+  U.remove.value.set(remove.r || 0, remove.y || 0, remove.g || 0, remove.b || 0);
+  U.keep.value.set(keep.r || 0, keep.y || 0, keep.g || 0, keep.b || 0);
+}
+export function bloom(strength = 0.55, radius = 0.6, threshold = 0.82) { if (bloomPass) { bloomPass.strength = strength; bloomPass.radius = radius; bloomPass.threshold = threshold; } }
+/** Tiefenunschaerfe: focus = Abstand Kamera→Motiv (Welt-Einheiten), aperture 0 = aus. */
+export function dof(focus = 5, aperture = 0.0025, maxblur = 0.01) {
+  post.dof = aperture; if (!bokehPass) return;
+  bokehPass.uniforms.focus.value = focus; bokehPass.uniforms.aperture.value = aperture; bokehPass.uniforms.maxblur.value = maxblur;
+}
+export function fog(color = '#1b2140', density = 0.035) { scene.fog = new THREE.FogExp2(color, density); }
+
+// ================================================================ Cartoon-Gesichter mit runden Augen (v2)
+export function drawFaceRound(g, w, h, expr, o = {}) {
+  g.clearRect(0, 0, w, h);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  const cx = w / 2, ey = h * 0.45, dx = w * 0.155, INK = '#2b2622';
+  const look = o.look || [0, 0];
+  if (o.beard) { // Bart unter allem anderen
+    g.fillStyle = o.beard; g.beginPath(); g.moveTo(cx - w * 0.3, h * 0.6);
+    g.quadraticCurveTo(cx - w * 0.32, h * 0.98, cx, h * 1.0); g.quadraticCurveTo(cx + w * 0.32, h * 0.98, cx + w * 0.3, h * 0.6);
+    g.quadraticCurveTo(cx + w * 0.15, h * 0.72, cx, h * 0.7); g.quadraticCurveTo(cx - w * 0.15, h * 0.72, cx - w * 0.3, h * 0.6); g.fill();
+  }
+  const eye = (x, { open = 1, s = 1, pup = 1 } = {}) => {
+    const rx = w * 0.085 * s, ry = h * 0.1 * s;
+    g.save(); g.beginPath(); g.ellipse(x, ey, rx, ry, 0, 0, Math.PI * 2); g.clip();
+    g.fillStyle = '#ffffff'; g.fillRect(x - rx, ey - ry, rx * 2, ry * 2);
+    g.fillStyle = '#1a1716'; g.beginPath(); g.arc(x + look[0] * rx * 0.45, ey + ry * 0.15 + look[1] * ry * 0.4, w * 0.036 * pup, 0, 7); g.fill();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x + look[0] * rx * 0.45 - w * 0.012, ey + ry * 0.05 + look[1] * ry * 0.4, w * 0.011 * pup, 0, 7); g.fill();
+    if (open < 1) { g.fillStyle = o.skin || '#f2f1ec'; g.fillRect(x - rx, ey - ry, rx * 2, ry * 2 * (1 - open)); g.strokeStyle = INK; g.lineWidth = w * 0.012; g.beginPath(); g.moveTo(x - rx, ey - ry + ry * 2 * (1 - open)); g.lineTo(x + rx, ey - ry + ry * 2 * (1 - open)); g.stroke(); }
+    g.restore();
+    g.strokeStyle = INK; g.lineWidth = w * 0.012; g.beginPath(); g.ellipse(x, ey, rx, ry, 0, 0, Math.PI * 2); g.stroke();
+  };
+  const closed = (x, up = true) => { g.strokeStyle = INK; g.lineWidth = w * 0.016; g.beginPath(); if (up) g.arc(x, ey + h * 0.035, w * 0.06, Math.PI * 1.15, Math.PI * 1.85); else g.arc(x, ey - h * 0.02, w * 0.06, Math.PI * 0.15, Math.PI * 0.85); g.stroke(); };
+  const brow = (x, y, ang, side) => { g.strokeStyle = o.browColor || INK; g.lineWidth = w * (o.bushy ? 0.034 : 0.018); g.beginPath(); g.moveTo(x - w * 0.07, y + side * ang * w * 0.06); g.lineTo(x + w * 0.07, y - side * ang * w * 0.06); g.stroke(); };
+  const mouth = (kind) => {
+    const my = h * 0.72; g.strokeStyle = INK; g.lineWidth = w * 0.016; g.fillStyle = '#3a1f1f';
+    g.beginPath();
+    if (kind === 'smile') { g.arc(cx, my - h * 0.05, w * 0.08, Math.PI * 0.2, Math.PI * 0.8); g.stroke(); }
+    else if (kind === 'grin') { g.moveTo(cx - w * 0.1, my - h * 0.02); g.quadraticCurveTo(cx, my + h * 0.1, cx + w * 0.1, my - h * 0.02); g.closePath(); g.fill(); g.stroke(); }
+    else if (kind === 'frown') { g.arc(cx, my + h * 0.05, w * 0.06, Math.PI * 1.2, Math.PI * 1.8); g.stroke(); }
+    else if (kind === 'wavy') { g.moveTo(cx - w * 0.07, my); g.bezierCurveTo(cx - w * 0.035, my - h * 0.03, cx - w * 0.01, my + h * 0.03, cx + w * 0.02, my); g.bezierCurveTo(cx + w * 0.04, my - h * 0.02, cx + w * 0.06, my + h * 0.01, cx + w * 0.07, my); g.stroke(); }
+    else if (kind === 'o') { g.ellipse(cx, my, w * 0.035, h * 0.045, 0, 0, Math.PI * 2); g.fill(); g.stroke(); }
+    else if (kind === 'talk') { g.ellipse(cx, my, w * 0.05, h * 0.03, 0, 0, Math.PI * 2); g.fill(); g.stroke(); }
+    else { g.moveTo(cx - w * 0.05, my); g.lineTo(cx + w * 0.05, my); g.stroke(); }
+  };
+  const by = ey - h * 0.15;
+  switch (expr) {
+    case 'smile': brow(cx - dx, by, 0.1, -1); brow(cx + dx, by, 0.1, 1); eye(cx - dx); eye(cx + dx); mouth('smile'); break;
+    case 'happy': brow(cx - dx, by - h * 0.02, 0.15, -1); brow(cx + dx, by - h * 0.02, 0.15, 1); closed(cx - dx); closed(cx + dx); mouth('grin'); break;
+    case 'sad': brow(cx - dx, by, -0.35, -1); brow(cx + dx, by, -0.35, 1); eye(cx - dx, { open: 0.8 }); eye(cx + dx, { open: 0.8 }); mouth('frown'); break;
+    case 'cry': brow(cx - dx, by, -0.4, -1); brow(cx + dx, by, -0.4, 1); eye(cx - dx, { open: 0.85 }); eye(cx + dx, { open: 0.85 }); mouth('wavy');
+      g.fillStyle = 'rgba(120,190,255,0.9)'; for (const x of [cx - dx + w * 0.05, cx + dx + w * 0.05]) { g.beginPath(); g.moveTo(x, ey + h * 0.08); g.quadraticCurveTo(x + w * 0.03, ey + h * 0.2, x, ey + h * 0.24); g.quadraticCurveTo(x - w * 0.025, ey + h * 0.2, x, ey + h * 0.08); g.fill(); } break;
+    case 'worried': brow(cx - dx, by - h * 0.02, -0.3, -1); brow(cx + dx, by - h * 0.02, -0.3, 1); eye(cx - dx, { s: 1.05 }); eye(cx + dx, { s: 1.05 }); mouth('wavy'); break;
+    case 'surprised': brow(cx - dx, by - h * 0.05, 0.05, -1); brow(cx + dx, by - h * 0.05, 0.05, 1); eye(cx - dx, { s: 1.12, pup: 0.75 }); eye(cx + dx, { s: 1.12, pup: 0.75 }); mouth('o'); break;
+    case 'talk': brow(cx - dx, by, 0, -1); brow(cx + dx, by, 0, 1); eye(cx - dx, { open: 0.75 }); eye(cx + dx, { open: 0.75 }); mouth('talk'); break;
+    case 'stern': brow(cx - dx, by + h * 0.02, 0.3, -1); brow(cx + dx, by + h * 0.02, 0.3, 1); eye(cx - dx, { open: 0.6 }); eye(cx + dx, { open: 0.6 }); mouth('line'); break;
+    case 'squint': brow(cx - dx, by + h * 0.02, 0.25, -1); brow(cx + dx, by + h * 0.02, -0.1, 1); eye(cx - dx, { open: 0.35 }); eye(cx + dx, { open: 0.45 }); mouth('wavy'); break;
+    case 'sleep': brow(cx - dx, by, 0, -1); brow(cx + dx, by, 0, 1); closed(cx - dx, false); closed(cx + dx, false); mouth('line'); break;
+    case 'sneer': brow(cx - dx, by + h * 0.02, 0.35, -1); brow(cx + dx, by, -0.1, 1); eye(cx - dx, { open: 0.5 }); eye(cx + dx, { open: 0.55 }); mouth('grin'); break;
+    default: brow(cx - dx, by, 0, -1); brow(cx + dx, by, 0, 1); eye(cx - dx); eye(cx + dx); mouth('line');
+  }
+  if (o.mustache) { g.fillStyle = o.mustacheColor || '#d9d9d9'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(cx + sd * w * 0.06, h * 0.655, w * 0.075, h * 0.03, sd * 0.2, 0, Math.PI * 2); g.fill(); } }
+  if (o.glasses) { g.strokeStyle = o.glasses; g.lineWidth = w * 0.014; for (const x of [cx - dx, cx + dx]) { g.beginPath(); g.arc(x, ey, w * 0.115, 0, 7); g.stroke(); } g.beginPath(); g.moveTo(cx - dx + w * 0.115, ey); g.quadraticCurveTo(cx, ey - h * 0.03, cx + dx - w * 0.115, ey); g.stroke(); }
+  if (o.wrinkles) { g.strokeStyle = 'rgba(60,50,45,0.45)'; g.lineWidth = w * 0.008; for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(cx + sd * (dx + w * 0.12), ey - h * 0.02); g.lineTo(cx + sd * (dx + w * 0.16), ey - h * 0.04); g.moveTo(cx + sd * (dx + w * 0.12), ey + h * 0.02); g.lineTo(cx + sd * (dx + w * 0.16), ey + h * 0.04); g.stroke(); } }
+  if (o.blush) { g.fillStyle = 'rgba(240,120,120,0.35)'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(cx + sd * w * 0.27, h * 0.6, w * 0.06, h * 0.03, 0, 0, Math.PI * 2); g.fill(); } }
+}
+
+// ================================================================ Requisiten (v2)
+export function topHat(color = '#1d1b22') {
+  const g = new THREE.Group(); g.add(cyl(0.58, 0.58, 0.04, color, {}, 32)); g.add(cyl(0.34, 0.34, 0.6, color, { pos: [0, 0.32, 0] }, 28));
+  g.add(cyl(0.345, 0.345, 0.1, '#8a1f2a', { pos: [0, 0.1, 0] }, 28)); return g;
+}
+export function hood(color) { // Kapuze hinter dem Kopf
+  return mesh(new THREE.SphereGeometry(0.58, 32, 16, Math.PI * 1.5 - 1.7, 3.4, 0, 1.95), toon(color, { side: THREE.DoubleSide }), { pos: [0, 0.02, -0.02] });
+}
+/** Leuchtendes Farbglas. fill 0..1 */
+export function jar(color, { fill = 0.8, s = 1, glow = 1.6 } = {}) {
+  const g = new THREE.Group(); g.scale.setScalar(s);
+  const glass = mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.5, 24, 1, true), noOutline(new THREE.MeshBasicMaterial({ color: '#cfe8ff', transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false })), { pos: [0, 0.27, 0], shadow: false });
+  const liquid = mesh(new THREE.CylinderGeometry(0.165, 0.165, 1, 24), noOutline(new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(glow) })), { shadow: false });
+  g.add(liquid); g.add(glass);
+  g.add(cyl(0.19, 0.19, 0.04, '#c9a24a', { pos: [0, 0.03, 0] }, 24));
+  g.add(cyl(0.15, 0.13, 0.08, '#a8784a', { pos: [0, 0.56, 0] }, 16));
+  const set = (f) => { liquid.scale.y = Math.max(0.001, f * 0.46); liquid.position.y = 0.05 + f * 0.23; liquid.visible = f > 0.01; };
+  set(fill); g.userData.setFill = set; g.userData.liquid = liquid; return g;
+}
+export function sunflower(h = 1.6, s = 1) {
+  const g = new THREE.Group(); g.scale.setScalar(s);
+  g.add(cyl(0.035, 0.045, h, '#4f8f3a', { pos: [0, h / 2, 0] }, 8));
+  for (const [y, sd] of [[h * 0.4, 1], [h * 0.6, -1]]) g.add(ball(0.16, '#5fae45', { pos: [sd * 0.14, y, 0], scale: [1.4, 0.25, 0.7], rot: [0, 0, sd * 0.4] }, 12));
+  const head = new THREE.Group(); head.position.set(0, h + 0.05, 0.05); head.rotation.x = 0.25; g.add(head);
+  head.add(cyl(0.16, 0.16, 0.08, '#5a3a1e', { rot: [Math.PI / 2, 0, 0] }, 24));
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; head.add(ball(0.11, '#ffd21f', { pos: [Math.cos(a) * 0.24, Math.sin(a) * 0.24, 0], scale: [0.55, 1, 0.25], rot: [0, 0, a - Math.PI / 2] }, 10)); }
+  return g;
+}
+/** Regen: gibt update(t) zurueck */
+export function rain({ n = 700, x = 8, y = 8, z = 6, cx = 0, cz = 0, color = '#a9c4ff' } = {}) {
+  const r = rand(3), pos = new Float32Array(n * 6), base = [];
+  for (let i = 0; i < n; i++) base.push([cx + (r() - 0.5) * x * 2, r() * y, cz + (r() - 0.5) * z * 2, 0.8 + r() * 0.4]);
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const lines = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.45 })); lines.frustumCulled = false; scene.add(lines);
+  return (t) => { for (let i = 0; i < n; i++) { const [bx, by, bz, sp] = base[i]; const yy = ((by - t * 9 * sp) % y + y) % y; pos.set([bx, yy, bz, bx - 0.02, yy + 0.28, bz], i * 6); } geo.attributes.position.needsUpdate = true; };
+}
+export function easel(painting, { w = 1.1, h = 0.85 } = {}) {
+  const g = new THREE.Group();
+  for (const [x, rz] of [[-0.35, -0.08], [0.35, 0.08]]) g.add(box(0.06, 2.0, 0.06, '#8a5a3b', { pos: [x, 1.0, 0], rot: [0, 0, rz] }));
+  g.add(box(0.06, 1.9, 0.06, '#8a5a3b', { pos: [0, 0.95, -0.35], rot: [-0.35, 0, 0] }));
+  g.add(box(w + 0.1, 0.05, 0.12, '#8a5a3b', { pos: [0, 0.95, 0.05] }));
+  const cv = mesh(new THREE.BoxGeometry(w, h, 0.04), [toon('#efe8d6'), toon('#efe8d6'), toon('#efe8d6'), toon('#efe8d6'), new THREE.MeshToonMaterial({ map: painting, gradientMap: gradientMap() }), toon('#efe8d6')], { pos: [0, 0.98 + h / 2, 0.08], rot: [-0.06, 0, 0] });
+  g.add(cv); return g;
+}
+export function sit(ch, seatY = 0.62) { const P = ch.userData.parts; P.legL.rotation.x = -1.5; P.legR.rotation.x = -1.5; ch.position.y = seatY - 0.62; }
+/** Sichtbarer Lichtkegel (additiv), Spitze bei pos */
+export function lightCone(pos, { r = 1.2, h = 2.6, color = '#ffd9a0', opacity = 0.16 } = {}) {
+  const tex = canvasTex(8, 128, (c) => { const g = c.createLinearGradient(0, 0, 0, 128); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 8, 128); });
+  const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 32, 1, true), noOutline(new THREE.MeshBasicMaterial({ color, map: tex, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })));
+  m.position.set(pos[0], pos[1] - h / 2, pos[2]); scene.add(m); return m;
+}
+/** Haengelampe mit Schirm, Gluehbirne, Licht und Lichtkegel */
+export function hangLamp(x, y, z, { color = '#ffc98a', power = 4, cone = true, shade = '#2f4a3f' } = {}) {
+  scene.add(cyl(0.01, 0.01, 2, '#222', { pos: [x, y + 1.15, z] }, 4));
+  scene.add(mesh(new THREE.CylinderGeometry(0.08, 0.42, 0.32, 24, 1, true), toon(shade, { side: THREE.DoubleSide }), { pos: [x, y, z] }));
+  scene.add(mesh(new THREE.SphereGeometry(0.09, 12, 10), noOutline(new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(1.6) })), { pos: [x, y - 0.1, z], shadow: false }));
+  const l = pointLight(color, power, [x, y - 0.25, z], 8);
+  if (cone) lightCone([x, y - 0.12, z], { r: 1.1, h: y - 0.2, color });
+  return l;
 }
