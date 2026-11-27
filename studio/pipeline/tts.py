@@ -18,7 +18,8 @@ from kokoro_onnx import Kokoro
 ROOT = Path(__file__).resolve().parent.parent
 FPS = 30
 LEAD_IN = 0.12
-TAIL = 0.7
+CFG_TAIL = None
+TAIL = 0.7  # Standard; pro Story ueberschreibbar mit "tail" in story.json
 
 
 def trim(a, thr=0.012, pad=0.03, sr=24000):
@@ -31,7 +32,7 @@ def trim(a, thr=0.012, pad=0.03, sr=24000):
 
 def pause_after(text, last):
     if last:
-        return TAIL
+        return CFG_TAIL or TAIL
     t = text.strip()
     if t.endswith(","):
         return 0.08
@@ -63,6 +64,8 @@ def align(model, audio, sr, text, offset):
 def main(story):
     sdir = ROOT / "stories" / story
     cfg = json.loads((sdir / "story.json").read_text())
+    global CFG_TAIL
+    CFG_TAIL = cfg.get("tail")
     out = sdir / "out"
     out.mkdir(parents=True, exist_ok=True)
     kok = Kokoro(str(ROOT / "models/kokoro-v1.0.onnx"), str(ROOT / "models/voices-v1.0.bin"))

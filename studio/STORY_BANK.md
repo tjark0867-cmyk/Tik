@@ -9,7 +9,7 @@ Jede hat ca. 175–190 Wörter, ergibt also ein Video über 60 Sekunden. Für je
 | 2 | The Five-Minute Clock | Text fertig | Straße ✅, Uhrturm 🆕, Bahnhof 🆕, Café ✅ |
 | 3 | The Pigeon Man | Text fertig | Straße ✅, Rathaus ✅ (Gebäude), Tauben 🆕, Dachboden ✅ (Raum) |
 | 4 | The Snow Shoveler | Text fertig | Straße ✅ (Winter 🆕), Schneehaufen 🆕, Schneepflug 🆕 |
-| 5 | The Free Bread | Text fertig | Straße ✅, Bäckerei ✅, Brote 🆕, Tafel ✅ |
+| 5 | The Free Bread | ✅ Video fertig | Straße ✅, Bäckerei ✅, Brote 🆕, Tafel ✅ |
 | 6 | The Rooster Gift | Text fertig | Häuser ✅, Hähne 🆕, Laden ✅, Schlafzimmer ✅ |
 
 ---

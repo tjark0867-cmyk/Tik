@@ -306,6 +306,11 @@ export function makeChar(o = {}) {
     hat.add(cyl(0.55, 0.55, 0.03, hc, {}, 32));
     const dome = ball(0.36, hc, { pos: [0, 0.02, 0] }, 28); dome.geometry = new THREE.SphereGeometry(0.36, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2); hat.add(dome);
     headG.add(hat); parts.hat = hat;
+  } else if (C.hat === 'chef') {
+    const hat = new THREE.Group(); hat.position.set(0, top - 0.06, 0);
+    hat.add(cyl(0.37, 0.37, 0.2, '#ffffff', { pos: [0, 0.1, 0] }, 28));
+    for (const [x, y, z, r] of [[0, 0.36, 0, 0.27], [0.2, 0.32, 0.08, 0.2], [-0.2, 0.32, 0.06, 0.2], [0.05, 0.33, -0.2, 0.2]]) hat.add(ball(r, '#ffffff', { pos: [x, y, z] }, 18));
+    headG.add(hat); parts.hat = hat;
   } else if (C.hat === 'beret') {
     headG.add(ball(0.48, hc, { pos: [0.06, top - 0.04, 0], scale: [1.05, 0.28, 1.05] }, 24));
   }
@@ -670,4 +675,12 @@ export async function loadFonts() {
   for (const [fam, path, wt] of F) { const f = new FontFace(fam, `url(/node_modules/@fontsource/${path})`, { weight: wt }); await f.load(); document.fonts.add(f); }
   // kursiver Playfair-Ersatz
   const it = new FontFace('Playfair Display', 'url(/node_modules/@fontsource/playfair-display/files/playfair-display-latin-400-normal.woff2)', { weight: '400', style: 'italic' }); await it.load(); document.fonts.add(it);
+}
+
+/** Brotlaib, Unterseite bei y = 0 */
+export function loaf(s = 1, color = '#d9964a') {
+  const g = new THREE.Group();
+  g.add(ball(0.34, color, { pos: [0, 0.187, 0], scale: [1, 0.55, 0.58] }, 24));
+  for (const x of [-0.15, 0, 0.15]) g.add(box(0.035, 0.02, 0.2, '#f3d29a', { pos: [x, 0.37, 0], rot: [0, 0.5, 0], shadow: false }));
+  g.scale.setScalar(s); return g;
 }

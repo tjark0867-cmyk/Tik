@@ -15,6 +15,7 @@ Feedback zu Video #1: Der Dieb ist in der Einstellung `sneak` mitten durch eine 
 Feedback: Die Stimme soll wie im Vorlage-Video klingen – **einladender, wärmer, erzählerischer**. `am_michael` (Video #1) war zu nüchtern.
 - Vorlage: männlicher Erzähler, ca. 183 Wörter/Min., mittlere Stimmlage (Grundton ≈ 155 Hz), warmer, leicht verschmitzter Erzählton mit Spannung in den Pausen.
 - Vor dem nächsten Video: **3–4 Stimmproben** desselben Absatzes erzeugen (z. B. Kokoro `bm_george`, `bm_fable`, `am_puck`, `am_fenrir` sowie Mischungen) und den Nutzer **wählen lassen**, bevor gerendert wird. Ich kann Audio nicht selbst anhören.
+- **Entscheidung (Video #2): Nutzer hat `am_puck` gewählt** – Standardstimme für alle weiteren Videos, Tempo ≈ 183 Wörter/Min.
 - Wenn keine Kokoro-Stimme nah genug herankommt: ElevenLabs vorschlagen (Nutzer gibt API-Key über das sichere Formular).
 
 ## Allgemein

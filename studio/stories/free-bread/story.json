@@ -1,0 +1,161 @@
+{
+  "title": "The Free Bread",
+  "voice": "am_puck",
+  "speed": 0.9,
+  "beats": [
+    {
+      "text": "One morning, every house in town found a fresh loaf of bread on the doorstep.",
+      "shots": [
+        "town_morning",
+        "doorstep_bread"
+      ]
+    },
+    {
+      "text": "Still warm. No note. No name.",
+      "shots": [
+        "bread_steam",
+        "man_door"
+      ],
+      "weights": [
+        1,
+        1.6
+      ]
+    },
+    {
+      "text": "The next morning, again. And the next.",
+      "shots": [
+        "doorsteps_row"
+      ]
+    },
+    {
+      "text": "Free bread. Every single day.",
+      "shots": [
+        "family_table"
+      ]
+    },
+    {
+      "text": "Nobody knew who was baking it.",
+      "shots": [
+        "night_hand"
+      ]
+    },
+    {
+      "text": "People stopped going to the bakeries.",
+      "shots": [
+        "bakery_empty"
+      ]
+    },
+    {
+      "text": "Why pay for bread when it shows up for free?",
+      "shots": [
+        "woman_walk"
+      ]
+    },
+    {
+      "text": "The first bakery closed after a month.",
+      "shots": [
+        "closed_1"
+      ]
+    },
+    {
+      "text": "Then the second.",
+      "shots": [
+        "closed_2"
+      ]
+    },
+    {
+      "text": "Then the third.",
+      "shots": [
+        "closed_3"
+      ]
+    },
+    {
+      "text": "By spring, there was only one bakery left in town.",
+      "shots": [
+        "board_left"
+      ]
+    },
+    {
+      "text": "A small shop on Church Street, owned by a friendly old man named Mr. Crumb.",
+      "shots": [
+        "crumb_shop",
+        "crumb_wave"
+      ]
+    },
+    {
+      "text": "And then, one Monday morning, the doorsteps were empty.",
+      "shots": [
+        "doorsteps_empty"
+      ]
+    },
+    {
+      "text": "No bread. Not that day. Not ever again.",
+      "shots": [
+        "man_sad"
+      ]
+    },
+    {
+      "text": "So the whole town lined up at the only bakery left.",
+      "shots": [
+        "queue"
+      ]
+    },
+    {
+      "text": "Mr. Crumb smiled, and raised his prices.",
+      "shots": [
+        "crumb_counter",
+        "price_10"
+      ]
+    },
+    {
+      "text": "Double.",
+      "shots": [
+        "price_20"
+      ]
+    },
+    {
+      "text": "Then triple.",
+      "shots": [
+        "price_30"
+      ]
+    },
+    {
+      "text": "You see, the free bread was never free.",
+      "shots": [
+        "bread_table"
+      ]
+    },
+    {
+      "text": "Mr. Crumb baked every single loaf himself, every night, in secret.",
+      "shots": [
+        "oven_night",
+        "crumb_baking"
+      ]
+    },
+    {
+      "text": "He lost money, every single day, for six whole months.",
+      "shots": [
+        "calendar"
+      ]
+    },
+    {
+      "text": "And now, he owns every slice of bread in town.",
+      "shots": [
+        "crumb_rich"
+      ]
+    },
+    {
+      "text": "People in town still miss the mystery baker.",
+      "shots": [
+        "window_miss"
+      ]
+    },
+    {
+      "text": "They have no idea they buy from him every morning.",
+      "shots": [
+        "final"
+      ]
+    }
+  ],
+  "tail": 2.2
+}

@@ -8,7 +8,7 @@ const OFFICER = { coat: '#3d5a8a', hat: 'police', hatColor: '#2c3e6b', expr: 'la
 const WOMAN = { coat: '#c4573f', dress: true, hair: '#6b3f22', hat: 'none', expr: 'surprised' };
 
 // ------------------------------------------------------------ Welten
-function town(L, { night = false, shopIndex = -1, n = 9, x0 = -16, lampsAt = [] } = {}) {
+export function town(L, { night = false, shopIndex = -1, n = 9, x0 = -16, lampsAt = [], pickSign = "PICKETT'S SOCKS", pickColor = '#7a2f2a' } = {}) {
   L.newScene();
   if (night) { L.sky({ night: true }); L.lights({ night: true }); L.stars(); L.moon([9, 19, -48], 2.6); }
   else { L.sky({}); L.lights({}); }
@@ -19,7 +19,7 @@ function town(L, { night = false, shopIndex = -1, n = 9, x0 = -16, lampsAt = [] 
   for (let i = 0; i < n; i++) {
     const isPick = i === shopIndex, isShop = isPick || i % 3 === 1;
     const b = L.building({ w: 4, h: 5.2 + ((i * 7) % 3) * 0.7, color: PAL[i % PAL.length], seed: i + 3, night, lit: night ? 0.45 : 0, shop: isShop,
-      sign: isPick ? "PICKETT'S SOCKS" : isShop ? shops[i % 4] : null, signColor: isPick ? '#7a2f2a' : '#2f5d4f', awning: isShop ? (isPick ? aw[0] : aw[i % 3]) : null });
+      sign: isPick ? pickSign : isShop ? shops[i % 4] : null, signColor: isPick ? pickColor : '#2f5d4f', awning: isShop ? (isPick ? aw[0] : aw[i % 3]) : null });
     b.position.set(x0 + i * 4, 0.12, -3.7); L.scene.add(b);
   }
   for (const x of lampsAt) L.lamp(x, -0.3, night);
@@ -38,7 +38,7 @@ function sockFlat(L, color, { s = 1, stripe = '#f2efe6' } = {}) {
   const g = new L.THREE.Group(); const k = L.sock(color, stripe, s); k.rotation.z = Math.PI / 2; k.position.y = 0.04 * s; k.scale.set(s, s, s); g.scale.y = 0.55; g.add(k); return g;
 }
 function fillDrawer(L, drawer, items) { const y = drawer.userData.floorY; for (const [obj, x, z, ry = 0] of items) { obj.position.set(x, y, z); obj.rotation.y = ry; drawer.add(obj); } }
-function hand(L, sleeve = '#34304a') {
+export function hand(L, sleeve = '#34304a') {
   const g = new L.THREE.Group();
   g.add(L.cyl(0.075, 0.085, 2.2, sleeve, { pos: [0, 1.15, 0] }, 14));
   g.add(L.cyl(0.13, 0.13, 0.12, '#ffffff', { pos: [0, 0.06, 0] }, 14));
@@ -61,8 +61,8 @@ function office(L) {
   const o2 = L.place(L.makeChar({ ...OFFICER, mustache: true }), 2.3, 1.3, -0.35);
   return { insp, o1, o2 };
 }
-function boardScene(L, lines, { night = false, shop = false } = {}) {
-  town(L, { night, shopIndex: shop ? 4 : -1, x0: -16, lampsAt: night ? [-2.6] : [] });
+export function boardScene(L, lines, { night = false, shop = false, pickSign } = {}) {
+  town(L, { night, shopIndex: shop ? 4 : -1, x0: -16, lampsAt: night ? [-2.6] : [], ...(pickSign ? { pickSign } : {}) });
   const b = L.chalkboard(lines, { w: 1.7, h: 2.3 }); b.position.set(0, 0.12, 0.2); L.scene.add(b);
   const sh = L.blobShadow(1.0); sh.position.set(0, 0.13, 0.2); L.scene.add(sh);
   return b;
