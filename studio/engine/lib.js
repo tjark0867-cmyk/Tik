@@ -35,11 +35,12 @@ export function newScene({ bg = '#87b5d8', fog = null } = {}) {
   if (fog) scene.fog = new THREE.Fog(fog.color, fog.near, fog.far);
   camera = new THREE.PerspectiveCamera(38, W / H, 0.05, 400);
   if (composer) { toonPass.scene = scene; toonPass.camera = camera; bokehPass.scene = scene; bokehPass.camera = camera; }
-  grade(); bloom(); dof(0);
+  grade(); bloom(); dof(0); sprites.length = 0; spriteLook.tint = '#ffffff'; spriteLook.rim = null;
   return scene;
 }
 
 export function render(t = 0) {
+  faceSpritesToCamera();
   if (!post.on) { effect.render(scene, camera); return; }
   gradePass.uniforms.time.value = t;
   bokehPass.enabled = post.dof > 0;
@@ -237,6 +238,7 @@ function drawFace(g, w, h, expr, o) {
  * hat: 'fedora' | 'police' | 'flatcap' | 'bowler' | 'beret' | 'none'
  */
 export function makeChar(o = {}) {
+  if (o.style === '2d') return makeSprite(o);
   if (o.style === 'ch') return makeChar2(o);
   const C = Object.assign({ coat: '#c9a56a', hat: 'fedora', hatColor: '#6f7f9a', expr: 'smug', mustache: false, socks: null,
     dress: false, hair: null, glove: '#ffffff', legs: '#1b1b1b', shoes: '#4a2d1c', buttons: '#5a3b22', head: '#f2f1ec', scale: 1 }, o);
@@ -345,6 +347,9 @@ export function shade(hex, amt) {
 
 // ---- Animationen (alle deterministisch ueber t in Sekunden)
 export function pose(ch, { t = 0, walk = 0, sneak = 0, bob = 1, armL = null, armR = null, look = 0, nod = 0, laugh = 0, lean = 0 } = {}) {
+  if (ch.userData.sprite) {                       // alte 3D-Armwinkel grob auf 2D-Arme abbilden
+    const o = arguments[1] || {}; const conv = (a) => !a ? [0.14, 0] : a[0] < -2.0 ? [2.6, 0] : a[0] < -0.8 ? [0.3, -1.9] : a[0] > 0.3 ? [0.35, 0] : [0.2, -0.6];
+    return spritePose(ch, { ...o, arms: o.arms || (armL || armR ? [conv(armL), conv(armR)] : null) }); }
   const P = ch.userData.parts;
   const ph = t * 7.5 * (walk || 1);
   const sw = walk ? Math.sin(ph) * 0.55 * Math.min(1, walk) : 0;
@@ -714,10 +719,10 @@ class ToonRenderPass extends Pass {
 const GradeShader = {
   uniforms: { tDiffuse: { value: null }, sat: { value: 1 }, contrast: { value: 1 }, bright: { value: 1 }, tint: { value: new THREE.Vector3(1, 1, 1) },
     vignette: { value: 0.45 }, grain: { value: 0.03 }, time: { value: 0 }, sepia: { value: 0 }, mono: { value: 0 },
-    remove: { value: new THREE.Vector4(0, 0, 0, 0) }, keep: { value: new THREE.Vector4(0, 0, 0, 0) }, lift: { value: new THREE.Vector3(0, 0, 0) } },
+    remove: { value: new THREE.Vector4(0, 0, 0, 0) }, keep: { value: new THREE.Vector4(0, 0, 0, 0) }, lift: { value: new THREE.Vector3(0, 0, 0) }, halftone: { value: 0 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
   fragmentShader: `
-    uniform sampler2D tDiffuse; uniform float sat, contrast, bright, vignette, grain, time, sepia, mono; uniform vec3 tint, lift; uniform vec4 remove, keep;
+    uniform sampler2D tDiffuse; uniform float sat, contrast, bright, vignette, grain, time, sepia, mono, halftone; uniform vec3 tint, lift; uniform vec4 remove, keep;
     varying vec2 vUv;
     vec3 rgb2hsv(vec3 c){ vec4 K=vec4(0.,-1./3.,2./3.,-1.); vec4 p=mix(vec4(c.bg,K.wz),vec4(c.gb,K.xy),step(c.b,c.g)); vec4 q=mix(vec4(p.xyw,c.r),vec4(c.r,p.yzx),step(p.x,c.r)); float d=q.x-min(q.w,q.y); return vec3(abs(q.z+(q.w-q.y)/(6.*d+1e-10)),d/(q.x+1e-10),q.x); }
     float band(float h, float c, float w){ float d=abs(h-c); d=min(d,1.-d); return 1.-smoothstep(w*0.6, w, d); }
@@ -741,6 +746,9 @@ const GradeShader = {
       col = (col - 0.5) * contrast + 0.5; col *= bright * tint;
       float v = smoothstep(0.95, 0.25, length((vUv - 0.5) * vec2(1.0, 1.25)));
       col *= mix(1., v, vignette);
+      vec2 hp = gl_FragCoord.xy / 7.0; vec2 cell = fract(hp) - 0.5; float dotv = 1.0 - smoothstep(0.18, 0.3, length(cell));
+      float dark = 1.0 - smoothstep(0.08, 0.35, dot(col, vec3(0.2126, 0.7152, 0.0722)));
+      col *= 1.0 - halftone * dark * dotv;
       float n = fract(sin(dot(vUv * vec2(1280., 720.) + fract(time * 7.13) * 91.7, vec2(12.9898, 78.233))) * 43758.5453);
       col += (n - 0.5) * grain;
       gl_FragColor = vec4(max(col, 0.), 1.);
@@ -756,11 +764,11 @@ function setupPost() {
   composer.addPass(new OutputPass());
 }
 /** Farb-Grading. remove/keep: {r,y,g,b} 0..1; mono: alles ausser keep entsaettigen. */
-export function grade({ sat = 1, contrast = 1.05, bright = 1, tint = [1, 1, 1], vignette = 0.45, grain = 0.035, sepia = 0, mono = 0, remove = {}, keep = {}, lift = [0, 0, 0] } = {}) {
+export function grade({ sat = 1, contrast = 1.05, bright = 1, tint = [1, 1, 1], vignette = 0.45, grain = 0.035, sepia = 0, mono = 0, remove = {}, keep = {}, lift = [0, 0, 0], halftone = post.halftone ?? 0 } = {}) {
   if (!gradePass) return;
   const U = gradePass.uniforms;
   U.sat.value = sat; U.contrast.value = contrast; U.bright.value = bright; U.tint.value.set(...tint); U.vignette.value = vignette; U.grain.value = grain;
-  U.sepia.value = sepia; U.mono.value = mono; U.lift.value.set(...lift);
+  U.sepia.value = sepia; U.mono.value = mono; U.lift.value.set(...lift); U.halftone.value = halftone;
   U.remove.value.set(remove.r || 0, remove.y || 0, remove.g || 0, remove.b || 0);
   U.keep.value.set(keep.r || 0, keep.y || 0, keep.g || 0, keep.b || 0);
 }
@@ -995,4 +1003,174 @@ export function bunting(x0, x1, y, z, colors = ['#e8343a', '#ffd21f', '#3f8bff',
   const pts = []; for (let i = 0; i <= 40; i++) { const t = i / 40; pts.push(new THREE.Vector3(x0 + t * (x1 - x0), y - Math.sin(t * Math.PI) * 0.5, z)); }
   g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: '#222' })));
   scene.add(g); return g;
+}
+
+// ================================================================ 2.5D: gezeichnete 2D-Figuren in 3D-Kulissen (v4)
+// Figur wird per Canvas-2D gezeichnet (Konturen, gemalte Schattierung) und als Billboard-Ebene in die Szene gestellt.
+const SPR_W = 640, SPR_H = 1280;            // Zeichenflaeche; 1 Welt-Einheit = 500 px
+const PX = 500;
+function shadeHex(hex, amt) { return shade(hex, amt); }
+export function drawFigure(g, C, P) {
+  const W = SPR_W, Hh = SPR_H, ink = '#1a1414', LW = 10;
+  g.clearRect(0, 0, W, Hh);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  const fx = W / 2, fy = Hh - 40;                    // Fusspunkt
+  const legLen = 0.62 * PX, torsoH = 0.64 * PX, headR = 0.46 * PX, torsoW = 0.58 * PX;   // Proportionen wie Vorlage 2: grosser Kopf, rundlicher kurzer Koerper
+  const bob = P.bob || 0, face = P.face || 0;      // face: -1 links … 0 vorne … 1 rechts
+  const hipY = fy - legLen + bob, shY = hipY - torsoH + 0.11 * PX;
+  const light = C.light || [-0.6, -0.8];             // Lichtrichtung (gemalte Schattierung)
+  const limb = (x1, y1, ang, len, w = LW * 1.15) => { const x2 = x1 + Math.sin(ang) * len, y2 = y1 + Math.cos(ang) * len; g.strokeStyle = C.limb || ink; g.lineWidth = w; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); return [x2, y2]; };
+  const hand = (x, y) => { g.fillStyle = C.limb || ink; g.beginPath(); g.arc(x, y, 13, 0, 7); g.fill(); };
+  const foot = (x, y, dir) => { g.fillStyle = C.limb || ink; g.beginPath(); g.ellipse(x + dir * 12, y, 24, 12, 0, 0, 7); g.fill(); };
+  const shadeFill = (path, base, x0, y0, x1, y1) => { const gr = g.createLinearGradient(x0, y0, x1, y1); gr.addColorStop(0, shadeHex(base, 0.07)); gr.addColorStop(0.55, base); gr.addColorStop(1, shadeHex(base, -0.13)); g.fillStyle = gr; path(); g.fill(); };
+  // Beine
+  const legA = P.legs || [0, 0];
+  for (const [i, s] of [[0, -1], [1, 1]]) { const [x, y] = limb(fx + s * 0.08 * PX, hipY, legA[i], legLen - 20); foot(x, y + 4, face || s * 0.4); }
+  // hinterer Arm
+  const armA = P.arms || [[0.14, 0], [0.14, 0]];
+  const shL = [fx - torsoW / 2 + 10, shY], shR = [fx + torsoW / 2 - 10, shY];
+  const backFirst = face >= 0 ? 0 : 1;
+  const drawArm = (i) => {                          // arms[i] = [Schulter, Ellbogen]; + = nach aussen/oben, Ellbogen - = nach innen
+    const sh = i === 0 ? shL : shR, sg = i === 0 ? -1 : 1, [sa, ea] = armA[i];
+    const [x1, y1] = limb(sh[0], sh[1], sg * sa, 0.27 * PX); const [x2, y2] = limb(x1, y1, sg * (sa + ea), 0.26 * PX); hand(x2, y2); return [x2, y2]; };
+  // Torso
+  const tx = fx - torsoW / 2, ty = hipY - torsoH, r = torsoW / 2;
+  const torsoPath = () => { g.beginPath(); if (C.dress) { g.moveTo(fx - torsoW * 0.36, ty + r * 0.6); g.quadraticCurveTo(fx, ty - r * 0.3, fx + torsoW * 0.36, ty + r * 0.6); g.lineTo(fx + torsoW * 0.78, hipY + 18); g.quadraticCurveTo(fx, hipY + 40, fx - torsoW * 0.78, hipY + 18); g.closePath(); } else g.roundRect(tx, ty, torsoW, torsoH + 12, r); };
+  const handsBack = P.handsBack;
+  let handPos = [null, null];
+  if (handsBack) { /* Arme hinter dem Ruecken: nur Ansatz sichtbar */ }
+  else handPos[backFirst] = drawArm(backFirst);
+  shadeFill(torsoPath, C.coat, tx, ty, tx + torsoW, ty + torsoH);
+  if (C.vest && !C.dress) { g.save(); torsoPath(); g.clip(); g.fillStyle = C.vest; g.fillRect(tx, ty, torsoW * 0.36, torsoH + 20); g.fillRect(tx + torsoW * 0.64, ty, torsoW * 0.36, torsoH + 20); g.restore(); }
+  g.strokeStyle = ink; g.lineWidth = LW; torsoPath(); g.stroke();
+  if (C.vest && !C.dress) { g.lineWidth = LW * 0.6; g.beginPath(); g.moveTo(tx + torsoW * 0.36, ty + 18); g.lineTo(tx + torsoW * 0.36, ty + torsoH); g.moveTo(tx + torsoW * 0.64, ty + 18); g.lineTo(tx + torsoW * 0.64, ty + torsoH); g.stroke(); }
+  if (C.pin) { g.fillStyle = C.pin; g.beginPath(); g.arc(fx + torsoW * 0.22, ty + torsoH * 0.35, 18, 0, 7); g.fill(); g.lineWidth = 5; g.stroke(); }
+  if (C.buttons && !C.vest && !C.dress) { g.fillStyle = C.buttons; for (const k of [0.3, 0.55, 0.8]) { g.beginPath(); g.arc(fx, ty + torsoH * k, 8, 0, 7); g.fill(); } }
+  if (!handsBack) handPos[1 - backFirst] = drawArm(1 - backFirst);
+  else { for (const s of [-1, 1]) { g.strokeStyle = C.limb || ink; g.lineWidth = LW * 1.15; g.beginPath(); g.moveTo(fx + s * (torsoW / 2 - 12), shY); g.lineTo(fx + s * (torsoW / 2 + 6), shY + 0.32 * PX); g.stroke(); } }
+  // Gehaltener Gegenstand
+  if (P.hold && handPos[P.holdHand ?? 1]) P.hold(g, handPos[P.holdHand ?? 1]);
+  // Kopf
+  const hx = fx + face * 18, hy = ty - headR * 0.7 + (P.headDy || 0);
+  g.save(); g.translate(hx, hy); g.rotate(P.tilt || 0);
+  if (C.hairStyle === 'bun') { g.fillStyle = C.hair; g.beginPath(); g.arc(-face * 20, -headR - 30, headR * 0.36, 0, 7); g.fill(); g.strokeStyle = ink; g.lineWidth = LW * 0.8; g.stroke(); }
+  if (C.hat === 'hood') { g.fillStyle = shadeHex(C.coat, -0.05); g.beginPath(); g.arc(0, 0, headR * 1.22, 0, 7); g.fill(); g.strokeStyle = ink; g.lineWidth = LW; g.stroke(); }
+  const hg = g.createRadialGradient(light[0] * headR * 0.5, light[1] * headR * 0.5, headR * 0.2, 0, 0, headR * 1.05);
+  hg.addColorStop(0, shadeHex(C.skin || '#fbf1e1', 0.04)); hg.addColorStop(0.7, C.skin || '#fbf1e1'); hg.addColorStop(1, shadeHex(C.skin || '#fbf1e1', -0.12));
+  g.fillStyle = hg; g.beginPath(); g.arc(0, 0, headR, 0, 7); g.fill();
+  if (C.rim) { g.save(); g.beginPath(); g.arc(0, 0, headR, 0, 7); g.clip(); g.strokeStyle = C.rim; g.globalAlpha = 0.55; g.lineWidth = 26; g.beginPath(); g.arc(-light[0] * 8, -light[1] * 8, headR, Math.atan2(-light[1], -light[0]) - 0.9, Math.atan2(-light[1], -light[0]) + 0.9); g.stroke(); g.restore(); }
+  g.strokeStyle = ink; g.lineWidth = LW * 1.1; g.beginPath(); g.arc(0, 0, headR, 0, 7); g.stroke();
+  // Gesicht (Gesichtszeichner der Engine, auf den Kopf projiziert)
+  const fc = document.createElement('canvas'); fc.width = fc.height = 512;
+  drawFaceRound(fc.getContext('2d'), 512, 512, P.expr || C.expr, { ...C, bold: true, skin: C.skin, look: [face * 0.6, 0] });
+  g.drawImage(fc, -headR * 1.0 + face * headR * 0.28, -headR * 1.02, headR * 2.0, headR * 2.0);
+  // Haare / Huete
+  if (C.hairStyle === 'spiky') {
+    g.fillStyle = C.hair; g.strokeStyle = ink; g.lineWidth = LW * 0.9;
+    g.beginPath(); g.moveTo(-headR * 0.98, -headR * 0.15);
+    const spikes = [[-0.95, -0.75], [-0.7, -0.6], [-0.62, -1.15], [-0.35, -0.75], [-0.18, -1.35], [0.05, -0.85], [0.3, -1.3], [0.42, -0.8], [0.75, -1.05], [0.8, -0.6], [1.02, -0.5]];
+    for (const [x, y] of spikes) g.lineTo((x + face * 0.15) * headR, y * headR);
+    g.lineTo(headR * 0.98, -headR * 0.15); g.quadraticCurveTo(0, -headR * 0.55, -headR * 0.98, -headR * 0.15); g.closePath(); g.fill(); g.stroke();
+    g.strokeStyle = shadeHex(C.hair, -0.2); g.lineWidth = 5; for (const [x, y] of spikes.slice(1, -1)) { g.beginPath(); g.moveTo(x * headR * 0.6, -headR * 0.55); g.lineTo((x + face * 0.15) * headR * 0.92, y * headR * 0.92); g.stroke(); }
+  } else if (C.hairStyle === 'bun') {
+    g.fillStyle = C.hair; g.strokeStyle = ink; g.lineWidth = LW * 0.9;
+    g.beginPath(); g.arc(0, 0, headR, Math.PI * 1.08, Math.PI * 1.92); g.quadraticCurveTo(0, -headR * 0.45, -headR * Math.cos(0.25), -headR * Math.sin(0.25)); g.fill(); g.stroke();
+    g.strokeStyle = shadeHex(C.hair, -0.2); g.lineWidth = 4; for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(i * headR * 0.18, -headR * 0.62); g.quadraticCurveTo(i * headR * 0.2, -headR * 0.85, i * headR * 0.12, -headR * 0.95); g.stroke(); }
+  } else if (C.hairStyle === 'tufts') {
+    g.fillStyle = C.hair; g.strokeStyle = ink; g.lineWidth = LW * 0.8;
+    for (const s of [-1, 1]) { g.beginPath(); g.ellipse(s * headR * 0.92, -headR * 0.15, headR * 0.2, headR * 0.3, s * 0.3, 0, 7); g.fill(); g.stroke(); }
+  }
+  if (C.hat === 'beret') { g.fillStyle = C.hatColor; g.strokeStyle = ink; g.lineWidth = LW; g.beginPath(); g.ellipse(face * 14, -headR * 0.82, headR * 1.05, headR * 0.36, -0.12, 0, 7); g.fill(); g.stroke(); g.beginPath(); g.arc(face * 14, -headR * 1.15, 10, 0, 7); g.fillStyle = ink; g.fill(); }
+  if (C.hat === 'tophat') { g.fillStyle = C.hatColor; g.strokeStyle = ink; g.lineWidth = LW; g.beginPath(); g.ellipse(0, -headR * 0.85, headR * 1.15, headR * 0.16, 0, 0, 7); g.fill(); g.stroke(); g.beginPath(); g.roundRect(-headR * 0.62, -headR * 2.05, headR * 1.24, headR * 1.2, 10); g.fill(); g.stroke(); g.fillStyle = '#8a1f2a'; g.fillRect(-headR * 0.6, -headR * 1.12, headR * 1.2, headR * 0.18); }
+  g.restore();
+  return { head: [hx, hy], hands: handPos };
+}
+/** 2.5D-Figur: gezeichnete Figur als Billboard. Gleiche API wie makeChar (userData.setExpr, pose via L.pose). */
+export function makeSprite(o = {}) {
+  const C = Object.assign({ coat: '#c8443a', skin: '#f6e0c4', expr: 'smile', hair: '#c9c3bb', tint: spriteLook.tint, rim: spriteLook.rim, scale: 1.15, billboard: true }, o);
+  const cv = document.createElement('canvas'); cv.width = SPR_W; cv.height = SPR_H;
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; disposables.push(tex);
+  const mat = noOutline(new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.35, color: C.tint, side: THREE.DoubleSide }));
+  const w = SPR_W / PX, h = SPR_H / PX;
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); plane.position.y = h / 2 - 40 / PX; plane.castShadow = false;
+  const root = new THREE.Group(); root.add(plane);
+  const state = { expr: C.expr, P: {} };
+  const redraw = () => { const r = drawFigure(cv.getContext('2d'), C, { ...state.P, expr: state.expr }); state.hands = r.hands; tex.needsUpdate = true; };
+  const handWorld = (i = 1, dy = -55) => { const h = state.hands && state.hands[i]; if (!h) return null; root.updateMatrixWorld(true);
+    return plane.localToWorld(new THREE.Vector3((h[0] - SPR_W / 2) / PX, (SPR_H / 2 - (h[1] + dy)) / PX, 0.05)); };
+  root.userData = { sprite: true, cfg: C, plane, state, redraw, handWorld, parts: {}, setExpr: (e) => { state.expr = e; redraw(); } };
+  root.userData.parts.expr = C.expr;
+  root.scale.setScalar(C.scale);
+  redraw(); if (C.billboard) sprites.push(root);
+  return root;
+}
+/** Pose fuer 2D-Figur: walk, arms [links, rechts] (Radiant, 0 = haengend, + = nach vorn/aussen), face -1..1, hold(g,[x,y]) */
+export function spritePose(ch, { t = 0, walk = 0, arms = null, face = null, hold = null, holdHand = 1, handsBack = false, tilt = 0, laugh = 0, bob = 1 } = {}) {
+  if (face === null) face = ch.userData.state.P.face || 0;
+  const st = ch.userData.state;
+  const sw = walk ? Math.sin(t * 7.5) * 0.35 : 0;
+  st.P = { legs: [sw, -sw], arms: arms || [[0.14 + (walk ? sw * 0.6 : Math.sin(t * 1.3) * 0.02), 0], [0.14 - (walk ? sw * 0.6 : 0), 0]], face, hold, holdHand, handsBack,
+    bob: (walk ? -Math.abs(Math.cos(t * 7.5)) * 14 : Math.sin(t * 2.2) * 3 * bob), tilt: tilt + (laugh ? Math.sin(t * 18) * 0.05 : 0), headDy: laugh ? -Math.abs(Math.sin(t * 18)) * 8 : 0 };
+  ch.userData.redraw();
+}
+export const sprites = [];
+const spriteLook = { tint: '#ffffff', rim: null };
+export function spriteTint(tint = '#ffffff', rim = null) { spriteLook.tint = tint; spriteLook.rim = rim; }
+function faceSpritesToCamera() {                   // Billboard: kurz vor dem Rendern zur Kamera drehen (nur Hochachse)
+  const p = new THREE.Vector3();
+  for (const ch of sprites) { if (!ch.parent) continue; ch.parent.updateMatrixWorld(); const par = new THREE.Vector3(); ch.parent.getWorldPosition(par);
+    ch.getWorldPosition(p); const a = Math.atan2(camera.position.x - p.x, camera.position.z - p.z); const pr = new THREE.Euler().setFromQuaternion(ch.parent.getWorldQuaternion(new THREE.Quaternion())).y; ch.rotation.y = a - pr;
+    const tgt = ch.userData.lookAt; if (tgt) {                           // Blickrichtung zum Ziel (im Bild links/rechts)
+      const right = new THREE.Vector3(); camera.getWorldDirection(right); right.cross(camera.up).normalize();
+      const d = new THREE.Vector3(...tgt).sub(p); const f = Math.max(-1, Math.min(1, d.dot(right) / Math.max(0.3, d.length()) * 1.6));
+      if (Math.abs((ch.userData.state.P.face || 0) - f) > 0.02) { ch.userData.state.P.face = f; ch.userData.redraw(); } } }
+}
+
+// ---------------------------------------------------------------- 2D-Requisiten zum Halten (zeichnen an der Hand)
+export const hold = {
+  jar: (color = '#ffd21f', tiltT = 0) => (g, [x, y]) => { g.save(); g.translate(x, y - 55); g.rotate(Math.sin(tiltT) * 0.3);
+    g.shadowColor = color; g.shadowBlur = 60; g.fillStyle = color; g.beginPath(); g.roundRect(-46, -30, 92, 105, 18); g.fill(); g.shadowBlur = 0;
+    g.fillStyle = 'rgba(255,255,255,0.45)'; g.fillRect(-34, -20, 14, 80); g.strokeStyle = '#1a1414'; g.lineWidth = 8; g.beginPath(); g.roundRect(-50, -58, 100, 136, 20); g.stroke();
+    g.fillStyle = '#a8784a'; g.beginPath(); g.roundRect(-38, -82, 76, 28, 6); g.fill(); g.stroke(); g.restore(); },
+  glasses: () => (g, [x, y]) => { g.strokeStyle = '#1a1414'; g.lineWidth = 7; for (const dx of [-26, 26]) { g.beginPath(); g.arc(x + dx, y - 22, 22, 0, 7); g.stroke(); } g.beginPath(); g.moveTo(x - 4, y - 24); g.lineTo(x + 4, y - 24); g.stroke(); },
+  brush: (tip = '#ffd21f') => (g, [x, y]) => { g.strokeStyle = '#8a5a3b'; g.lineWidth = 10; g.beginPath(); g.moveTo(x - 10, y + 20); g.lineTo(x + 30, y - 70); g.stroke(); g.strokeStyle = '#1a1414'; g.lineWidth = 3; g.stroke();
+    g.fillStyle = tip; g.beginPath(); g.ellipse(x + 34, y - 80, 9, 16, 0.4, 0, 7); g.fill(); g.lineWidth = 4; g.stroke(); },
+  can: () => (g, [x, y]) => { g.fillStyle = '#5fae9a'; g.strokeStyle = '#1a1414'; g.lineWidth = 7; g.beginPath(); g.roundRect(x - 40, y - 10, 80, 70, 12); g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(x + 38, y + 20); g.lineTo(x + 95, y - 25); g.stroke(); g.beginPath(); g.arc(x, y - 10, 26, Math.PI, 0); g.stroke(); },
+};
+/** Weicher additiver Lichtschein (z. B. leuchtendes Glas in der Hand). Gibt das Sprite zurueck (position setzen). */
+export function glow(color = '#ffd21f', size = 0.9, strength = 1.6) {
+  const tex = canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 2, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: new THREE.Color(color).multiplyScalar(strength), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+  sp.scale.setScalar(size); sp.renderOrder = 5; scene.add(sp); return sp;
+}
+// ---------------------------------------------------------------- Gemalte Hintergruende (2.5D-Ebenen)
+export function backdrop(type = 'day', { z = -45, w = 130, h = 40, y = 18 } = {}) {
+  const tex = canvasTex(2048, 900, (c) => {
+    const r = rand(type.length * 7 + 3);
+    const sky = { day: ['#5fb4ff', '#d9f1ff'], sunset: ['#3f5fbf', '#ffc08a'], night: ['#0f1540', '#3c4383'], gray: ['#8e9ab3', '#c7cdd8'] }[type] || ['#5fb4ff', '#d9f1ff'];
+    const gr = c.createLinearGradient(0, 0, 0, 900); gr.addColorStop(0, sky[0]); gr.addColorStop(1, sky[1]); c.fillStyle = gr; c.fillRect(0, 0, 2048, 900);
+    if (type === 'night') { for (let i = 0; i < 300; i++) { c.fillStyle = `rgba(255,250,220,${0.3 + r() * 0.7})`; c.fillRect(r() * 2048, r() * 500, 2, 2); }
+      c.fillStyle = '#f6f0d4'; c.shadowColor = '#fff6d0'; c.shadowBlur = 60; c.beginPath(); c.arc(1500, 420, 46, 0, 7); c.fill(); c.shadowBlur = 0; }
+    else { for (let i = 0; i < 11; i++) { const cx = r() * 2048, cy = 330 + r() * 260, s = 50 + r() * 80; c.fillStyle = type === 'sunset' ? 'rgba(255,200,170,0.75)' : 'rgba(255,255,255,0.85)';
+      for (let k = 0; k < 6; k++) { c.beginPath(); c.ellipse(cx + (k - 2.5) * s * 0.5, cy + Math.sin(k) * s * 0.15, s * 0.55, s * 0.32, 0, 0, 7); c.fill(); } }
+      if (type === 'sunset') { c.fillStyle = '#fff3c4'; c.shadowColor = '#ffd27a'; c.shadowBlur = 80; c.beginPath(); c.arc(1024, 640, 70, 0, 7); c.fill(); c.shadowBlur = 0; } }
+    // Ferne Silhouetten: Stadt (Nacht) oder Baumreihe (Tag)
+    if (type === 'night') {
+      let x = 0; while (x < 2048) { const bw = 60 + r() * 120, bh = 120 + r() * 260; c.fillStyle = '#1b2150'; c.fillRect(x, 900 - bh, bw, bh);
+        for (let wy = 900 - bh + 14; wy < 880; wy += 22) for (let wx = x + 8; wx < x + bw - 10; wx += 18) if (r() < 0.35) { c.fillStyle = r() < 0.8 ? '#ffcf6a' : '#9fd1ff'; c.fillRect(wx, wy, 8, 10); }
+        x += bw + 4; }
+    } else {
+      for (let layer = 0; layer < 2; layer++) { c.fillStyle = layer ? '#4f9a46' : '#7fb07a'; c.beginPath(); c.moveTo(0, 900);
+        for (let x = 0; x <= 2048; x += 30) c.lineTo(x, 760 - layer * 40 + Math.sin(x * 0.02 + layer) * 20 - r() * 40); c.lineTo(2048, 900); c.fill(); }
+    }
+  });
+  const m = mesh(new THREE.PlaneGeometry(w, h), noOutline(new THREE.MeshBasicMaterial({ map: tex, fog: false })), { pos: [0, y, z], shadow: false });
+  scene.add(m); return m;
+}
+/** Nasse Strasse: Lichtreflex-Streifen unter Lichtquellen (additiv) */
+export function wetGlint(x, z, color = '#ffc977', len = 2.2, w = 0.5) {
+  const tex = canvasTex(64, 256, (c) => { const g = c.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.4, 'rgba(255,255,255,0.8)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 64, 256); });
+  const m = mesh(new THREE.PlaneGeometry(w, len), noOutline(new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(color).multiplyScalar(0.8), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })), { rot: [-Math.PI / 2, 0, 0], pos: [x, 0.02, z], shadow: false });
+  scene.add(m); return m;
 }
