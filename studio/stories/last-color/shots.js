@@ -52,7 +52,7 @@ function studio(L) {
   L.pointLight('#fff1d6', 3, [0, 3.5, 3], 9);
   const paint = [paintingSun(L), paintingSea(L), paintingPoppies(L)];
   const eas = [[-1.7, 0.9, 0.35], [0.2, 0.45, 0], [2.0, 0.95, -0.35]].map(([x, z, ry], i) => { const e = L.easel(paint[i]); e.position.set(x, 0, z); e.rotation.y = ry; L.scene.add(e); return e; });
-  for (let i = 0; i < 5; i++) { const j = L.jar(JARS[i], { s: 0.6, glow: 1.0 }); j.position.set(-3.2 + i * 0.4, 0.95, 0.2); L.scene.add(j); }
+  for (let i = 0; i < 5; i++) { const j = L.jar(JARS[i], { s: 0.6, glow: 1.0 }); j.position.set(-3.2 + i * 0.4, 0.9, 0.2); L.scene.add(j); }
   L.scene.add(L.box(2.2, 0.9, 0.6, '#7a5233', { pos: [-2.4, 0.45, 0.2] }));
   return eas;
 }
@@ -128,6 +128,7 @@ export const shots = {
   },
   city_night(L, dur) {
     town(L, { night: true, shopIndex: 4, pickSign: 'COLORS · BOUGHT & SOLD', pickColor: '#2a1f3a', lampsAt: [-6, 5.5] }); L.post.on = true; L.fog('#1a2148', 0.04); L.bloom(0.9, 0.7, 0.7); L.grade(NIGHT);
+    L.scene.add(L.box(2.3, 0.06, 0.34, '#5a3a26', { pos: [-0.3, 0.92, -2.05] })); L.scene.add(L.box(2.3, 0.4, 0.05, '#4a2e1e', { pos: [-0.3, 0.72, -1.9] }));  // Auslagebrett unter den Glaesern
     for (let i = 0; i < 5; i++) { const j = L.jar(JARS[i], { s: 0.7, glow: 2.2 }); j.position.set(-1.1 + i * 0.4, 0.95, -2.05); L.scene.add(j); }
     L.backdrop('night'); L.wetGlint(-6, 0.9); L.wetGlint(5.5, 0.9); L.post.halftone = 0.22; L.spriteTint('#cdd2f2', '#ffc98a');
     const rn = L.rain({ cz: 1, x: 8, z: 5, y: 9 });
@@ -135,6 +136,7 @@ export const shots = {
   },
   shop_sign(L, dur) {
     town(L, { night: true, shopIndex: 4, pickSign: 'COLORS · BOUGHT & SOLD', pickColor: '#2a1f3a' }); L.post.on = true; L.fog('#1a2148', 0.035); L.bloom(1.0, 0.7, 0.65); L.grade(NIGHT);
+    L.scene.add(L.box(2.3, 0.06, 0.34, '#5a3a26', { pos: [-0.3, 0.92, -2.05] })); L.scene.add(L.box(2.3, 0.4, 0.05, '#4a2e1e', { pos: [-0.3, 0.72, -1.9] }));  // Auslagebrett unter den Glaesern
     for (let i = 0; i < 5; i++) { const j = L.jar(JARS[i + 2], { s: 0.7, glow: 2.2 }); j.position.set(-1.1 + i * 0.4, 0.95, -2.05); L.scene.add(j); }
     L.backdrop('night'); L.wetGlint(-0.6, 0.3, '#ffd98a'); L.wetGlint(0.6, 0.3, '#9fd1ff');
     const rn = L.rain({ cz: 0, x: 4, z: 3, y: 6 });

@@ -73,6 +73,22 @@ def main(story):
     out = sdir / "out"
     out.mkdir(parents=True, exist_ok=True)
     kok = Kokoro(str(ROOT / "models/kokoro-v1.0.onnx"), str(ROOT / "models/voices-v1.0.bin"))
+    cb = {}
+    if cfg.get("tts") == "chatterbox":                      # alle Beats vorab mit Chatterbox erzeugen (eigene venv)
+        import subprocess, tempfile
+        tmp = Path(tempfile.mkdtemp())
+        ref = cfg.get("voice_ref")
+        if ref and ref.startswith("kokoro:"):                # Kokoro-Stimme als Klangvorlage (lizenzfrei)
+            a_ref, sr_ref = kok.create("Every story has a secret. And this one starts on a quiet little street, where nothing ever seemed to happen.", voice=ref.split(":")[1], speed=1.0, lang="en-us")
+            sf.write(tmp / "ref.wav", a_ref, sr_ref); ref = str(tmp / "ref.wav")
+        items = [{"text": b["text"], "out": str(tmp / f"b{i:03d}.wav")} for i, b in enumerate(cfg["beats"])]
+        (tmp / "job.json").write_text(json.dumps({"ref": ref, "exaggeration": cfg.get("exaggeration", 0.6), "cfg_weight": cfg.get("cfg_weight", 0.4), "items": items}))
+        subprocess.run([str(ROOT / ".venv-cb/bin/python"), str(ROOT / "pipeline/cb_say.py"), str(tmp / "job.json")], check=True)
+        tempo = cfg.get("tempo", 1.0)
+        for i, it in enumerate(items):
+            outp = it["out"].replace(".wav", "_t.wav")
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", it["out"], "-af", f"atempo={tempo},aresample=24000", outp], check=True)
+            a, _ = sf.read(outp, dtype="float32"); cb[i] = a if a.ndim == 1 else a.mean(axis=1)
     from faster_whisper import WhisperModel
     wm = WhisperModel("base.en", device="cpu", compute_type="int8", download_root=str(ROOT / "models/whisper"))
 
@@ -82,7 +98,8 @@ def main(story):
     beats, words, exact = [], [], 0
     for i, b in enumerate(cfg["beats"]):
         last = i == len(cfg["beats"]) - 1
-        a, sr = kok.create(b["text"], voice=cfg.get("voice", "am_michael"), speed=cfg.get("speed", 1.0), lang="en-us")
+        if cb: a, sr = cb[i], 24000
+        else: a, sr = kok.create(b["text"], voice=cfg.get("voice", "am_michael"), speed=cfg.get("speed", 1.0), lang="en-us")
         a = trim(np.asarray(a, np.float32), sr=sr)
         w, ok = align(wm, a, sr, b["text"], t)
         exact += ok

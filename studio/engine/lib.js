@@ -793,6 +793,7 @@ export function drawFaceRound(g, w, h, expr, o = {}) {
     g.quadraticCurveTo(cx + w * 0.15, h * 0.72, cx, h * 0.7); g.quadraticCurveTo(cx - w * 0.15, h * 0.72, cx - w * 0.3, h * 0.6); g.fill();
   }
   const eye = (x, { open = 1, s = 1, pup = 1 } = {}) => {
+    s *= o.eyeScale || 1; pup *= o.eyeScale || 1;
     const rx = w * 0.085 * s, ry = h * 0.1 * s;
     g.save(); g.beginPath(); g.ellipse(x, ey, rx, ry, 0, 0, Math.PI * 2); g.clip();
     g.fillStyle = '#ffffff'; g.fillRect(x - rx, ey - ry, rx * 2, ry * 2);
@@ -1062,7 +1063,7 @@ export function drawFigure(g, C, P) {
   g.strokeStyle = ink; g.lineWidth = LW * 1.1; g.beginPath(); g.arc(0, 0, headR, 0, 7); g.stroke();
   // Gesicht (Gesichtszeichner der Engine, auf den Kopf projiziert)
   const fc = document.createElement('canvas'); fc.width = fc.height = 512;
-  drawFaceRound(fc.getContext('2d'), 512, 512, P.expr || C.expr, { ...C, bold: true, skin: C.skin, look: [face * 0.6, 0] });
+  drawFaceRound(fc.getContext('2d'), 512, 512, P.expr || C.expr, { ...C, bold: true, eyeScale: C.eyeScale ?? (C.glasses ? 0.85 : 0.72), skin: C.skin, look: [face * 0.6, 0] });
   g.drawImage(fc, -headR * 1.0 + face * headR * 0.28, -headR * 1.02, headR * 2.0, headR * 2.0);
   // Haare / Huete
   if (C.hairStyle === 'spiky') {

@@ -8,3 +8,4 @@ studio/models/
 studio/stories/*/out/
 studio/stories/test/
 studio/stories/*/*.mp4
+studio/.venv-cb/
