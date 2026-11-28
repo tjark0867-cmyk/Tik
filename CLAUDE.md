@@ -16,7 +16,7 @@ Feedback: Die Stimme soll wie im Vorlage-Video klingen – **einladender, wärme
 - Vorlage: männlicher Erzähler, ca. 183 Wörter/Min., mittlere Stimmlage (Grundton ≈ 155 Hz), warmer, leicht verschmitzter Erzählton mit Spannung in den Pausen.
 - Vor dem nächsten Video: **3–4 Stimmproben** desselben Absatzes erzeugen (z. B. Kokoro `bm_george`, `bm_fable`, `am_puck`, `am_fenrir` sowie Mischungen) und den Nutzer **wählen lassen**, bevor gerendert wird. Ich kann Audio nicht selbst anhören.
 - **Entscheidung (Video #2): Nutzer hat `am_puck` gewählt** – Standardstimme für alle weiteren Videos, Tempo ≈ 183 Wörter/Min.
-- **Entscheidung (Vorlage 2 „Every Memory Has a Price“): `am_eric`, Tempo ≈ 228 Wörter/Min., kaum Pausen** – Standard für Videos im filmischen Stil der Vorlage 2.
+- **Entscheidung (Vorlage 2, aktualisiert): `am_puck` mit Tempo ≈ 228 Wörter/Min. (story.json `"speed": 1.08`), kaum Pausen** – Standard für Videos im filmischen 2.5D-Stil. (`am_eric` war vorher, Nutzer bevorzugt am_puck.)
 - Wenn keine Kokoro-Stimme nah genug herankommt: ElevenLabs vorschlagen (Nutzer gibt API-Key über das sichere Formular).
 
 ## Vorlage 2 – filmischer Stil ("Every Memory Has a Price")
